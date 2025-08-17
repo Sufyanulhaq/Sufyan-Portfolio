@@ -5,8 +5,8 @@ export interface IComment extends Document {
   author: mongoose.Types.ObjectId
   post: mongoose.Types.ObjectId
   parentComment?: mongoose.Types.ObjectId
-  approved: boolean
-  likes: number
+  isApproved: boolean
+  isSpam: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -34,23 +34,24 @@ const CommentSchema = new Schema<IComment>(
       ref: "Comment",
       default: null,
     },
-    approved: {
+    isApproved: {
       type: Boolean,
       default: false,
     },
-    likes: {
-      type: Number,
-      default: 0,
+    isSpam: {
+      type: Boolean,
+      default: false,
     },
   },
   {
     timestamps: true,
-  },
+  }
 )
 
-// Indexes
+// Indexes for better performance
 CommentSchema.index({ post: 1, createdAt: -1 })
 CommentSchema.index({ author: 1 })
-CommentSchema.index({ approved: 1 })
+CommentSchema.index({ isApproved: 1 })
+CommentSchema.index({ isSpam: 1 })
 
 export default mongoose.models.Comment || mongoose.model<IComment>("Comment", CommentSchema)

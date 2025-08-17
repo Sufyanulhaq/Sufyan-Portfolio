@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
     "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint",
-    "start": "next start"
+    "seed": "node scripts/seed-database.js",
+    "seed:dev": "NODE_ENV=development node scripts/seed-database.js",
+    "test:seed": "node scripts/test-seeder.js"
   },
   "dependencies": {
     "@auth/core": "latest",

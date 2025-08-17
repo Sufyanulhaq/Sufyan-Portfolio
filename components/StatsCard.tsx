@@ -1,47 +1,54 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { TrendingUp, TrendingDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { LucideIcon } from "lucide-react"
 
 interface StatsCardProps {
   title: string
   value: string | number
-  description?: string
-  icon?: LucideIcon
+  description: string
+  icon: React.ComponentType<{ className?: string }>
+  color?: string
   trend?: {
     value: number
-    label: string
     type: "positive" | "negative" | "neutral"
+    label: string
   }
-  className?: string
 }
 
-export default function StatsCard({ title, value, description, icon: Icon, trend, className }: StatsCardProps) {
+export default function StatsCard({
+  title,
+  value,
+  description,
+  icon: Icon,
+  color = "text-blue-600",
+  trend,
+}: StatsCardProps) {
   return (
-    <Card className={cn("", className)}>
+    <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Icon className={cn("h-4 w-4 text-muted-foreground", color)} />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
+        <p className="text-xs text-muted-foreground">{description}</p>
         {trend && (
           <div className="flex items-center mt-2">
+            {trend.type === "positive" ? (
+              <TrendingUp className="h-3 w-3 text-green-600 mr-1" />
+            ) : trend.type === "negative" ? (
+              <TrendingDown className="h-3 w-3 text-red-600 mr-1" />
+            ) : null}
             <Badge
-              variant={trend.type === "positive" ? "secondary" : trend.type === "negative" ? "destructive" : "outline"}
-              className={cn(
-                "text-xs",
-                trend.type === "positive" && "bg-green-100 text-green-800 hover:bg-green-100",
-                trend.type === "negative" && "bg-red-100 text-red-800 hover:bg-red-100",
-              )}
+              variant={trend.type === "positive" ? "default" : "secondary"}
+              className="text-xs"
             >
-              {trend.type === "positive" ? "+" : trend.type === "negative" ? "-" : ""}
-              {Math.abs(trend.value)}%
+              {trend.type === "positive" ? "+" : ""}
+              {trend.value}% {trend.label}
             </Badge>
-            <span className="text-xs text-muted-foreground ml-2">{trend.label}</span>
           </div>
         )}
       </CardContent>

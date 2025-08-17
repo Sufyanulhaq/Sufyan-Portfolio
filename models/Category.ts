@@ -4,13 +4,8 @@ export interface ICategory extends Document {
   name: string
   slug: string
   description?: string
-  color: string
-  icon?: string
-  parentCategory?: mongoose.Types.ObjectId
+  color?: string
   isActive: boolean
-  sortOrder: number
-  postCount: number
-  createdBy: mongoose.Types.ObjectId
   createdAt: Date
   updatedAt: Date
 }
@@ -26,48 +21,33 @@ const CategorySchema = new Schema<ICategory>(
     slug: {
       type: String,
       required: true,
+      trim: true,
       unique: true,
       lowercase: true,
     },
     description: {
       type: String,
-      maxlength: 200,
+      trim: true,
+      maxlength: 500,
     },
     color: {
       type: String,
-      required: true,
-      default: "#3B82F6",
-    },
-    icon: String,
-    parentCategory: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
+      trim: true,
+      default: "#0ea5e9",
     },
     isActive: {
       type: Boolean,
       default: true,
     },
-    sortOrder: {
-      type: Number,
-      default: 0,
-    },
-    postCount: {
-      type: Number,
-      default: 0,
-    },
-    createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
   },
   {
     timestamps: true,
-  },
+  }
 )
 
+// Indexes for better performance
 CategorySchema.index({ slug: 1 })
 CategorySchema.index({ isActive: 1 })
-CategorySchema.index({ sortOrder: 1 })
+CategorySchema.index({ createdAt: -1 })
 
 export default mongoose.models.Category || mongoose.model<ICategory>("Category", CategorySchema)

@@ -3,7 +3,7 @@ import mongoose, { type Document, Schema } from "mongoose"
 export interface IUserActivity extends Document {
   user: mongoose.Types.ObjectId
   action: string
-  resource: string
+  resource?: string
   resourceId?: mongoose.Types.ObjectId
   details?: Record<string, any>
   ipAddress?: string
@@ -21,50 +21,37 @@ const UserActivitySchema = new Schema<IUserActivity>(
     action: {
       type: String,
       required: true,
-      enum: [
-        "LOGIN",
-        "LOGOUT",
-        "CREATE_POST",
-        "UPDATE_POST",
-        "DELETE_POST",
-        "CREATE_PROJECT",
-        "UPDATE_PROJECT",
-        "DELETE_PROJECT",
-        "CREATE_COMMENT",
-        "UPDATE_COMMENT",
-        "DELETE_COMMENT",
-        "VIEW_POST",
-        "LIKE_POST",
-        "SHARE_POST",
-        "SUBSCRIBE_NEWSLETTER",
-        "CONTACT_FORM_SUBMIT",
-        "PROFILE_UPDATE",
-        "PASSWORD_CHANGE",
-        "EMAIL_VERIFY",
-      ],
+      trim: true,
     },
     resource: {
       type: String,
-      required: true,
-      enum: ["USER", "POST", "PROJECT", "COMMENT", "CATEGORY", "TAG", "NEWSLETTER", "CONTACT"],
+      trim: true,
     },
     resourceId: {
       type: Schema.Types.ObjectId,
     },
     details: {
       type: Schema.Types.Mixed,
+      default: {},
     },
-    ipAddress: String,
-    userAgent: String,
+    ipAddress: {
+      type: String,
+      trim: true,
+    },
+    userAgent: {
+      type: String,
+      trim: true,
+    },
   },
   {
-    timestamps: { createdAt: true, updatedAt: false },
-  },
+    timestamps: true,
+  }
 )
 
+// Indexes for better performance
 UserActivitySchema.index({ user: 1, createdAt: -1 })
 UserActivitySchema.index({ action: 1 })
-UserActivitySchema.index({ resource: 1 })
+UserActivitySchema.index({ resource: 1, resourceId: 1 })
 UserActivitySchema.index({ createdAt: -1 })
 
 export default mongoose.models.UserActivity || mongoose.model<IUserActivity>("UserActivity", UserActivitySchema)

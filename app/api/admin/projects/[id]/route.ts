@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import connectDB from "@/lib/mongodb"
-import Post from "@/models/Post"
+import Project from "@/models/Project"
 
 export async function GET(
   request: NextRequest,
@@ -15,7 +15,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user has permission to view posts
+    // Check if user has permission to view projects
     if (!["SUPER_ADMIN", "ADMIN", "EDITOR", "VIEWER"].includes(session.user.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
@@ -23,31 +23,27 @@ export async function GET(
     const { id } = params
     
     if (!id || id === "undefined") {
-      return NextResponse.json({ error: "Post ID is required" }, { status: 400 })
+      return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
     await connectDB()
 
-    const post = await Post.findById(id).populate("author", "name email")
+    const project = await Project.findById(id)
 
-    if (!post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 })
+    if (!project) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    const formattedPost = {
-      ...post.toObject(),
-      _id: post._id.toString(),
-      author: post.author ? {
-        ...post.author,
-        _id: post.author._id.toString(),
-      } : null,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
+    const formattedProject = {
+      ...project.toObject(),
+      _id: project._id.toString(),
+      createdAt: project.createdAt.toISOString(),
+      updatedAt: project.updatedAt.toISOString(),
     }
 
-    return NextResponse.json({ post: formattedPost })
+    return NextResponse.json({ project: formattedProject })
   } catch (error) {
-    console.error("Error fetching post:", error)
+    console.error("Error fetching project:", error)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -66,8 +62,8 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user has permission to edit posts
-    if (!["SUPER_ADMIN", "ADMIN", "EDITOR"].includes(session.user.role)) {
+    // Check if user has permission to edit projects
+    if (!["SUPER_ADMIN", "ADMIN"].includes(session.user.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -75,39 +71,39 @@ export async function PATCH(
     const body = await request.json()
     
     if (!id || id === "undefined") {
-      return NextResponse.json({ error: "Post ID is required" }, { status: 400 })
+      return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
     await connectDB()
 
-    // Check if post exists
-    const existingPost = await Post.findById(id)
-    if (!existingPost) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 })
+    // Check if project exists
+    const existingProject = await Project.findById(id)
+    if (!existingProject) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    // Update post
-    const updatedPost = await Post.findByIdAndUpdate(
+    // Update project
+    const updatedProject = await Project.findByIdAndUpdate(
       id,
       { $set: body },
       { new: true, runValidators: true }
-    ).populate("author", "name email")
+    )
 
-    if (!updatedPost) {
-      return NextResponse.json({ error: "Failed to update post" }, { status: 500 })
+    if (!updatedProject) {
+      return NextResponse.json({ error: "Failed to update project" }, { status: 500 })
     }
 
     return NextResponse.json({
-      message: "Post updated successfully",
-      post: {
-        ...updatedPost.toObject(),
-        _id: updatedPost._id.toString(),
-        createdAt: updatedPost.createdAt.toISOString(),
-        updatedAt: updatedPost.updatedAt.toISOString(),
+      message: "Project updated successfully",
+      project: {
+        ...updatedProject.toObject(),
+        _id: updatedProject._id.toString(),
+        createdAt: updatedProject.createdAt.toISOString(),
+        updatedAt: updatedProject.updatedAt.toISOString(),
       }
     })
   } catch (error) {
-    console.error("Error updating post:", error)
+    console.error("Error updating project:", error)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -126,7 +122,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user has permission to delete posts
+    // Check if user has permission to delete projects
     if (!["SUPER_ADMIN", "ADMIN"].includes(session.user.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
@@ -134,25 +130,25 @@ export async function DELETE(
     const { id } = params
     
     if (!id || id === "undefined") {
-      return NextResponse.json({ error: "Post ID is required" }, { status: 400 })
+      return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
     await connectDB()
 
-    // Check if post exists
-    const existingPost = await Post.findById(id)
-    if (!existingPost) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 })
+    // Check if project exists
+    const existingProject = await Project.findById(id)
+    if (!existingProject) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    // Delete post
-    await Post.findByIdAndDelete(id)
+    // Delete project
+    await Project.findByIdAndDelete(id)
 
     return NextResponse.json({
-      message: "Post deleted successfully"
+      message: "Project deleted successfully"
     })
   } catch (error) {
-    console.error("Error deleting post:", error)
+    console.error("Error deleting project:", error)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

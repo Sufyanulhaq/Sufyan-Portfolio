@@ -2,19 +2,14 @@ import mongoose, { type Document, Schema } from "mongoose"
 
 export interface INewsletter extends Document {
   email: string
-  name?: string
-  isActive: boolean
+  firstName?: string
+  lastName?: string
+  isSubscribed: boolean
+  source?: string
+  ipAddress?: string
+  userAgent?: string
   subscribedAt: Date
   unsubscribedAt?: Date
-  preferences: {
-    frequency: "daily" | "weekly" | "monthly"
-    categories: string[]
-  }
-  metadata: {
-    source?: string
-    ipAddress?: string
-    userAgent?: string
-  }
   createdAt: Date
   updatedAt: Date
 }
@@ -24,44 +19,54 @@ const NewsletterSchema = new Schema<INewsletter>(
     email: {
       type: String,
       required: true,
-      unique: true,
-      lowercase: true,
       trim: true,
+      lowercase: true,
+      unique: true,
     },
-    name: {
+    firstName: {
+      type: String,
+      trim: true,
+      maxlength: 50,
+    },
+    lastName: {
+      type: String,
+      trim: true,
+      maxlength: 50,
+    },
+    isSubscribed: {
+      type: Boolean,
+      default: true,
+    },
+    source: {
+      type: String,
+      trim: true,
+      enum: ["Website", "Blog", "Social Media", "Referral", "Other"],
+    },
+    ipAddress: {
       type: String,
       trim: true,
     },
-    isActive: {
-      type: Boolean,
-      default: true,
+    userAgent: {
+      type: String,
+      trim: true,
     },
     subscribedAt: {
       type: Date,
       default: Date.now,
     },
-    unsubscribedAt: Date,
-    preferences: {
-      frequency: {
-        type: String,
-        enum: ["daily", "weekly", "monthly"],
-        default: "weekly",
-      },
-      categories: [String],
-    },
-    metadata: {
-      source: String,
-      ipAddress: String,
-      userAgent: String,
+    unsubscribedAt: {
+      type: Date,
     },
   },
   {
     timestamps: true,
-  },
+  }
 )
 
+// Indexes for better performance
 NewsletterSchema.index({ email: 1 })
-NewsletterSchema.index({ isActive: 1 })
+NewsletterSchema.index({ isSubscribed: 1 })
 NewsletterSchema.index({ subscribedAt: -1 })
+NewsletterSchema.index({ createdAt: -1 })
 
 export default mongoose.models.Newsletter || mongoose.model<INewsletter>("Newsletter", NewsletterSchema)

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/mongodb"
-import Post from "@/models/Post"
+import Project from "@/models/Project"
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,16 +8,21 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "10")
     const category = searchParams.get("category") || "all"
-    const search = searchParams.get("search") || ""
+    const status = searchParams.get("status") || "all"
     const featured = searchParams.get("featured") || "all"
+    const search = searchParams.get("search") || ""
     
     await connectDB()
 
     // Build query
-    const query: any = { published: true }
+    const query: any = {}
     
     if (category !== "all") {
       query.category = category
+    }
+    
+    if (status !== "all") {
+      query.status = status
     }
     
     if (featured !== "all") {
@@ -27,37 +32,32 @@ export async function GET(request: NextRequest) {
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: "i" } },
-        { excerpt: { $regex: search, $options: "i" } },
-        { content: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { longDescription: { $regex: search, $options: "i" } },
       ]
     }
 
     // Execute query with pagination
     const skip = (page - 1) * limit
     
-    const [posts, total] = await Promise.all([
-      Post.find(query)
-        .populate("author", "name")
-        .sort({ createdAt: -1 })
+    const [projects, total] = await Promise.all([
+      Project.find(query)
+        .sort({ featured: -1, createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
-      Post.countDocuments(query),
+      Project.countDocuments(query),
     ])
 
-    const formattedPosts = posts.map((post) => ({
-      ...post,
-      _id: post._id.toString(),
-      author: post.author ? {
-        ...post.author,
-        _id: post.author._id.toString(),
-      } : null,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
+    const formattedProjects = projects.map((project) => ({
+      ...project,
+      _id: project._id.toString(),
+      createdAt: project.createdAt.toISOString(),
+      updatedAt: project.updatedAt.toISOString(),
     }))
 
     return NextResponse.json({
-      posts: formattedPosts,
+      projects: formattedProjects,
       pagination: {
         page,
         limit,
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error("Error fetching blog posts:", error)
+    console.error("Error fetching portfolio projects:", error)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
