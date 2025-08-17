@@ -44,4 +44,4 @@ TagSchema.index({ slug: 1 })
 TagSchema.index({ isActive: 1 })
 TagSchema.index({ createdAt: -1 })
 
-export default mongoose.models.Tag || mongoose.model<ITag>("Tag", TagSchema)
+export default mongoose.models.Tag || mongoose.model<ITag>("Tag", TagSchema, "tags")

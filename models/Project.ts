@@ -16,6 +16,7 @@ export interface IProject extends Document {
   startDate: Date
   endDate?: Date
   client?: string
+  author?: mongoose.Types.ObjectId
   testimonial?: {
     content: string
     author: string
@@ -84,6 +85,10 @@ const ProjectSchema = new Schema<IProject>(
     },
     endDate: Date,
     client: String,
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
     testimonial: {
       content: String,
       author: String,
@@ -102,4 +107,4 @@ ProjectSchema.index({ featured: 1, createdAt: -1 })
 ProjectSchema.index({ category: 1 })
 ProjectSchema.index({ status: 1 })
 
-export default mongoose.models.Project || mongoose.model<IProject>("Project", ProjectSchema)
+export default mongoose.models.Project || mongoose.model<IProject>("Project", ProjectSchema, "projects")

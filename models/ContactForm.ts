@@ -115,4 +115,4 @@ ContactFormSchema.index({ assignedTo: 1 })
 ContactFormSchema.index({ email: 1 })
 ContactFormSchema.index({ createdAt: -1 })
 
-export default mongoose.models.ContactForm || mongoose.model<IContactForm>("ContactForm", ContactFormSchema)
+export default mongoose.models.ContactForm || mongoose.model<IContactForm>("ContactForm", ContactFormSchema, "contactforms")

@@ -54,4 +54,4 @@ CommentSchema.index({ author: 1 })
 CommentSchema.index({ isApproved: 1 })
 CommentSchema.index({ isSpam: 1 })
 
-export default mongoose.models.Comment || mongoose.model<IComment>("Comment", CommentSchema)
+export default mongoose.models.Comment || mongoose.model<IComment>("Comment", CommentSchema, "comments")

@@ -50,4 +50,4 @@ CategorySchema.index({ slug: 1 })
 CategorySchema.index({ isActive: 1 })
 CategorySchema.index({ createdAt: -1 })
 
-export default mongoose.models.Category || mongoose.model<ICategory>("Category", CategorySchema)
+export default mongoose.models.Category || mongoose.model<ICategory>("Category", CategorySchema, "categories")

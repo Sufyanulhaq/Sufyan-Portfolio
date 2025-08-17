@@ -69,4 +69,4 @@ NewsletterSchema.index({ isSubscribed: 1 })
 NewsletterSchema.index({ subscribedAt: -1 })
 NewsletterSchema.index({ createdAt: -1 })
 
-export default mongoose.models.Newsletter || mongoose.model<INewsletter>("Newsletter", NewsletterSchema)
+export default mongoose.models.Newsletter || mongoose.model<INewsletter>("Newsletter", NewsletterSchema, "newsletters")

@@ -95,4 +95,4 @@ PostSchema.index({ author: 1 })
 PostSchema.index({ category: 1 })
 PostSchema.index({ tags: 1 })
 
-export default mongoose.models.Post || mongoose.model<IPost>("Post", PostSchema)
+export default mongoose.models.Post || mongoose.model<IPost>("Post", PostSchema, "posts")

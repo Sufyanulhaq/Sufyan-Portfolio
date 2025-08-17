@@ -54,4 +54,4 @@ UserActivitySchema.index({ action: 1 })
 UserActivitySchema.index({ resource: 1, resourceId: 1 })
 UserActivitySchema.index({ createdAt: -1 })
 
-export default mongoose.models.UserActivity || mongoose.model<IUserActivity>("UserActivity", UserActivitySchema)
+export default mongoose.models.UserActivity || mongoose.model<IUserActivity>("UserActivity", UserActivitySchema, "useractivities")

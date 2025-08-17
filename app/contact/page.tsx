@@ -23,12 +23,27 @@ export default function ContactPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setFormData({ name: "", email: "", subject: "", message: "" })
+        alert(data.message || "Message sent successfully!")
+      } else {
+        alert(data.error || "Failed to send message. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error sending message:", error)
+      alert("Failed to send message. Please try again.")
+    } finally {
       setIsLoading(false)
-      setFormData({ name: "", email: "", subject: "", message: "" })
-      alert("Message sent successfully!")
-    }, 1000)
+    }
   }
 
   return (

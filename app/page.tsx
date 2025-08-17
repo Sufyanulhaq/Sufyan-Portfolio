@@ -5,7 +5,7 @@ import Link from "next/link"
 import Navbar from "@/components/navbar"
 import BlogSection from "@/components/blog-section"
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
