@@ -1,68 +1,19 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
-import { hasPermission, hasRoleLevel, type UserRole } from "./lib/auth"
-import { addSecurityHeaders, logSecurityEvent } from "./lib/security"
-import { apiRateLimit, authRateLimit, contactRateLimit } from "./lib/rate-limit"
-import { startPerformanceTracking, endPerformanceTracking, addPerformanceHeaders } from "./lib/performance"
 
 export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token
     const pathname = req.nextUrl.pathname
-    const method = req.method
-
-    // Start performance tracking
-    const requestId = startPerformanceTracking(req)
-
-    // Apply rate limiting
-    let rateLimitResult
-    if (pathname.startsWith("/api/auth")) {
-      rateLimitResult = authRateLimit.check(req)
-    } else if (pathname.startsWith("/api/contact")) {
-      rateLimitResult = contactRateLimit.check(req)
-    } else if (pathname.startsWith("/api/")) {
-      rateLimitResult = apiRateLimit.check(req)
-    }
-
-    if (rateLimitResult && !rateLimitResult.success) {
-      logSecurityEvent({
-        type: "RATE_LIMIT_EXCEEDED",
-        ip: req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown",
-        userAgent: req.headers.get("user-agent") || undefined,
-        userId: token?.sub,
-        details: { pathname, method },
-      })
-
-      const response = NextResponse.json(
-        { error: "Rate limit exceeded", retryAfter: rateLimitResult.resetTime },
-        { status: 429 },
-      )
-
-      response.headers.set("X-RateLimit-Limit", rateLimitResult.limit.toString())
-      response.headers.set("X-RateLimit-Remaining", rateLimitResult.remaining.toString())
-      response.headers.set("X-RateLimit-Reset", rateLimitResult.resetTime.toString())
-
-      return addSecurityHeaders(response)
-    }
 
     // Create response
     const response = NextResponse.next()
 
-    // Add security headers
-    addSecurityHeaders(response)
-
-    // Add rate limit headers if applicable
-    if (rateLimitResult) {
-      response.headers.set("X-RateLimit-Limit", rateLimitResult.limit.toString())
-      response.headers.set("X-RateLimit-Remaining", rateLimitResult.remaining.toString())
-      response.headers.set("X-RateLimit-Reset", rateLimitResult.resetTime.toString())
-    }
-
-    // End performance tracking and add headers
-    const metrics = endPerformanceTracking(requestId, response.status)
-    if (metrics) {
-      addPerformanceHeaders(response, metrics)
-    }
+    // Add basic security headers
+    response.headers.set("X-Content-Type-Options", "nosniff")
+    response.headers.set("X-Frame-Options", "DENY")
+    response.headers.set("X-XSS-Protection", "1; mode=block")
+    response.headers.set("Referrer-Policy", "origin-when-cross-origin")
 
     return response
   },
@@ -70,57 +21,52 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname
-        const userRole = token?.role as UserRole
 
         if (!token) {
-          // Log unauthorized access attempts
-          logSecurityEvent({
-            type: "INVALID_TOKEN",
-            ip: req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown",
-            userAgent: req.headers.get("user-agent") || undefined,
-            details: { pathname, method: req.method },
-          })
           return false
         }
 
+        // Basic role-based access control
+        const userRole = token?.role as string
+
         // Super Admin routes
         if (pathname.startsWith("/admin/system")) {
-          return hasPermission(userRole, "MANAGE_SYSTEM")
+          return userRole === "SUPER_ADMIN"
         }
 
         // User management routes
         if (pathname.startsWith("/admin/users")) {
-          return hasPermission(userRole, "MANAGE_USERS")
+          return ["SUPER_ADMIN", "ADMIN"].includes(userRole)
         }
 
         // Content management routes
         if (pathname.startsWith("/admin/posts")) {
-          return hasPermission(userRole, "MANAGE_POSTS")
+          return ["SUPER_ADMIN", "ADMIN", "EDITOR"].includes(userRole)
         }
 
         // Project management routes
         if (pathname.startsWith("/admin/projects")) {
-          return hasPermission(userRole, "MANAGE_PROJECTS")
+          return ["SUPER_ADMIN", "ADMIN"].includes(userRole)
         }
 
         // Analytics routes
         if (pathname.startsWith("/admin/analytics")) {
-          return hasPermission(userRole, "VIEW_ANALYTICS")
+          return ["SUPER_ADMIN", "ADMIN", "EDITOR"].includes(userRole)
         }
 
         // Contact management routes
         if (pathname.startsWith("/admin/contacts")) {
-          return hasPermission(userRole, "MANAGE_CONTACTS")
+          return ["SUPER_ADMIN", "ADMIN"].includes(userRole)
         }
 
         // General admin access (dashboard, comments)
         if (pathname.startsWith("/admin")) {
-          return hasRoleLevel(userRole, "VIEWER")
+          return ["SUPER_ADMIN", "ADMIN", "EDITOR", "VIEWER"].includes(userRole)
         }
 
         // API routes protection
         if (pathname.startsWith("/api/admin")) {
-          return hasRoleLevel(userRole, "VIEWER")
+          return ["SUPER_ADMIN", "ADMIN", "EDITOR", "VIEWER"].includes(userRole)
         }
 
         // Profile routes - all authenticated users
@@ -135,5 +81,5 @@ export default withAuth(
 )
 
 export const config = {
-  matcher: ["/admin/:path*", "/profile/:path*", "/api/admin/:path*", "/api/auth/:path*", "/api/contact/:path*"],
+  matcher: ["/admin/:path*", "/profile/:path*", "/api/admin/:path*", "/api/auth/:path*"],
 }

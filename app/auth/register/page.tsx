@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import dynamic from "next/dynamic"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -10,6 +11,10 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+
+// Prevent prerendering
+export const dynamic = "force-dynamic"
+export const revalidate = false
 
 export default function RegisterPage() {
   const [name, setName] = useState("")

@@ -9,7 +9,9 @@
     "lint": "next lint",
     "seed": "tsx scripts/seed-database.ts",
     "seed:dev": "NODE_ENV=development tsx scripts/seed-database.ts",
-    "test:seed": "node scripts/test-seeder.js"
+    "test:seed": "node scripts/test-seeder.js",
+    "build:prod": "node scripts/build-production.js",
+    "export": "next export"
   },
   "dependencies": {
     "@auth/core": "latest",
@@ -71,7 +73,7 @@
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "vaul": "^0.9.9",
+
     "zod": "3.25.67"
   },
   "devDependencies": {

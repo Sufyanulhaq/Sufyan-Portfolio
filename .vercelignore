@@ -1,0 +1,37 @@
+# Development files
+.env.local
+.env.development
+.env.test
+
+# Build artifacts
+.next
+out
+dist
+
+# Dependencies
+node_modules
+.pnpm-store
+
+# Development scripts
+scripts/
+*.log
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+*.md
+!README.md

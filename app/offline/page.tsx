@@ -1,5 +1,3 @@
-"use client"
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { WifiOff, RefreshCw, Home } from "lucide-react"
@@ -20,9 +18,11 @@ export default function OfflinePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Button onClick={() => window.location.reload()} className="w-full" variant="default">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Try Again
+            <Button asChild className="w-full" variant="default">
+              <Link href="/">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Try Again
+              </Link>
             </Button>
             <Button asChild variant="outline" className="w-full bg-transparent">
               <Link href="/">
