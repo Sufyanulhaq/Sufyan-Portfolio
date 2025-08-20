@@ -102,7 +102,7 @@ const ProjectSchema = new Schema<IProject>(
 )
 
 // Indexes
-ProjectSchema.index({ slug: 1 })
+// Remove duplicate slug index since unique: true already creates it
 ProjectSchema.index({ featured: 1, createdAt: -1 })
 ProjectSchema.index({ category: 1 })
 ProjectSchema.index({ status: 1 })

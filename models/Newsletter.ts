@@ -64,7 +64,7 @@ const NewsletterSchema = new Schema<INewsletter>(
 )
 
 // Indexes for better performance
-NewsletterSchema.index({ email: 1 })
+// Remove duplicate email index since unique: true already creates it
 NewsletterSchema.index({ isSubscribed: 1 })
 NewsletterSchema.index({ subscribedAt: -1 })
 NewsletterSchema.index({ createdAt: -1 })
