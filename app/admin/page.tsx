@@ -1,13 +1,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { FileText, FolderOpen, Users, Eye, Heart, MessageSquare, BarChart3 } from "lucide-react"
-import connectDB from "@/lib/mongodb"
-import Post from "@/models/Post"
-import User from "@/models/User"
-import Project from "@/models/Project"
-import Comment from "@/models/Comment"
 import Link from "next/link"
 import Button from "@/components/ui/button"
+
+// Force dynamic rendering to prevent build-time MongoDB connection
+export const dynamic = 'force-dynamic'
+
+// Dynamic imports to prevent build-time analysis
+const connectDB = () => import("@/lib/mongodb").then(m => m.default())
+const Post = () => import("@/models/Post").then(m => m.default)
+const User = () => import("@/models/User").then(m => m.default)
+const Project = () => import("@/models/Project").then(m => m.default)
+const Comment = () => import("@/models/Comment").then(m => m.default)
 import StatsCard from "@/components/StatsCard"
 
 async function getDashboardStats() {
@@ -16,13 +21,13 @@ async function getDashboardStats() {
 
     const [postsCount, usersCount, projectsCount, commentsCount, totalViews, totalLikes, recentPosts] =
       await Promise.all([
-        Post.countDocuments(),
-        User.countDocuments(),
-        Project.countDocuments(),
-        Comment.countDocuments(),
-        Post.aggregate([{ $group: { _id: null, total: { $sum: "$views" } } }]),
-        Post.aggregate([{ $group: { _id: null, total: { $sum: "$likes" } } }]),
-        Post.find().populate("author", "name").sort({ createdAt: -1 }).limit(5).lean(),
+        (await Post()).countDocuments(),
+        (await User()).countDocuments(),
+        (await Project()).countDocuments(),
+        (await Comment()).countDocuments(),
+        (await Post()).aggregate([{ $group: { _id: null, total: { $sum: "$views" } } }]),
+        (await Post()).aggregate([{ $group: { _id: null, total: { $sum: "$likes" } } }]),
+        (await Post()).find().populate("author", "name").sort({ createdAt: -1 }).limit(5).lean(),
       ])
 
     return {

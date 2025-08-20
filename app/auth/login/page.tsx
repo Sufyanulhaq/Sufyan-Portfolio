@@ -14,7 +14,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 
 // Prevent prerendering
 export const dynamic = "force-dynamic"
-export const revalidate = false
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")

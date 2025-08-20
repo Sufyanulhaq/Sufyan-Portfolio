@@ -5,6 +5,9 @@ import Link from "next/link"
 import Navbar from "@/components/navbar"
 import BlogSection from "@/components/blog-section"
 
+// Force dynamic rendering to prevent build-time data fetching
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   return (
     <div className="min-h-screen bg-background">
