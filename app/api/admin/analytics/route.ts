@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import connectDB from "@/lib/mongodb"
-import Post from "@/models/Post"
-import User from "@/models/User"
-import Project from "@/models/Project"
-import Comment from "@/models/Comment"
-import UserActivity from "@/models/UserActivity"
+
+// Force dynamic rendering to prevent build-time analysis
+export const dynamic = 'force-dynamic'
+
+// Dynamic imports to prevent build-time analysis
+const connectDB = () => import("@/lib/mongodb").then(m => m.default())
+const Post = () => import("@/models/Post").then(m => m.default)
+const User = () => import("@/models/User").then(m => m.default)
+const Project = () => import("@/models/Project").then(m => m.default)
+const Comment = () => import("@/models/Comment").then(m => m.default)
+const UserActivity = () => import("@/models/UserActivity").then(m => m.default)
 
 export async function GET(request: NextRequest) {
   // Prevent build-time execution
@@ -66,32 +71,32 @@ export async function GET(request: NextRequest) {
     ] = await Promise.all([
       // Total stats
       Promise.all([
-        Post.countDocuments({ published: true }),
-        User.countDocuments({ isActive: true }),
-        Post.aggregate([{ $group: { _id: null, total: { $sum: "$views" } } }]),
-        Comment.countDocuments({ isApproved: true }),
+        (await Post()).countDocuments({ published: true }),
+        (await User()).countDocuments({ isActive: true }),
+        (await Post()).aggregate([{ $group: { _id: null, total: { $sum: "$views" } } }]),
+        (await Comment()).countDocuments({ isApproved: true }),
       ]),
       
       // Period stats
       Promise.all([
-        Post.countDocuments({ 
+        (await Post()).countDocuments({ 
           published: true, 
           createdAt: { $gte: startDate } 
         }),
-        User.countDocuments({ 
+        (await User()).countDocuments({ 
           createdAt: { $gte: startDate } 
         }),
-        Post.aggregate([
+        (await Post()).aggregate([
           { $match: { createdAt: { $gte: startDate } } },
           { $group: { _id: null, total: { $sum: "$views" } } },
         ]),
-        Comment.countDocuments({ 
+        (await Comment()).countDocuments({ 
           createdAt: { $gte: startDate } 
         }),
       ]),
       
       // Top performing pages
-      Post.find({ published: true })
+      (await Post()).find({ published: true })
         .sort({ views: -1 })
         .limit(10)
         .select("title views createdAt")
@@ -107,7 +112,7 @@ export async function GET(request: NextRequest) {
       ]),
       
       // User behavior
-      UserActivity.aggregate([
+      (await UserActivity()).aggregate([
         { $match: { createdAt: { $gte: startDate } } },
         {
           $group: {

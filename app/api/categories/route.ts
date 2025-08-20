@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
-import connectDB from "@/lib/mongodb"
-import Category from "@/models/Category"
+
+// Force dynamic rendering to prevent build-time analysis
+export const dynamic = 'force-dynamic'
+
+// Dynamic imports to prevent build-time analysis
+const connectDB = () => import("@/lib/mongodb").then(m => m.default())
+const Category = () => import("@/models/Category").then(m => m.default)
 
 export async function GET(request: NextRequest) {
   // Prevent build-time execution
@@ -14,7 +19,7 @@ export async function GET(request: NextRequest) {
       await connectDB()
     }
 
-    const categories = await Category.find({ isActive: true })
+    const categories = await (await Category()).find({ isActive: true })
       .sort({ name: 1 })
       .lean()
 

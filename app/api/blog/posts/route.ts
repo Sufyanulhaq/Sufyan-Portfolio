@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import connectDB from "@/lib/mongodb"
-import { Post, User } from "@/lib/models"
+
+// Force dynamic rendering to prevent build-time analysis
+export const dynamic = 'force-dynamic'
+
+// Dynamic imports to prevent build-time analysis
+const connectDB = () => import("@/lib/mongodb").then(m => m.default())
+const Post = () => import("@/lib/models").then(m => m.Post)
+const User = () => import("@/lib/models").then(m => m.User)
 
 export async function GET(request: NextRequest) {
   // Prevent build-time execution
@@ -42,11 +48,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Get total count
-    const total = await Post.countDocuments(query)
+    const total = await (await Post()).countDocuments(query)
     const pages = Math.ceil(total / limit)
 
     // Get posts
-    const posts = await Post.find(query)
+    const posts = await (await Post()).find(query)
       .populate("author", "name email bio avatar")
       .sort({ createdAt: -1 })
       .skip(skip)
