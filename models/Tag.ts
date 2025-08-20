@@ -40,7 +40,7 @@ const TagSchema = new Schema<ITag>(
 )
 
 // Indexes for better performance
-TagSchema.index({ slug: 1 })
+// Remove duplicate slug index since unique: true already creates it
 TagSchema.index({ isActive: 1 })
 TagSchema.index({ createdAt: -1 })
 

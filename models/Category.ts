@@ -46,7 +46,7 @@ const CategorySchema = new Schema<ICategory>(
 )
 
 // Indexes for better performance
-CategorySchema.index({ slug: 1 })
+// Remove duplicate slug index since unique: true already creates it
 CategorySchema.index({ isActive: 1 })
 CategorySchema.index({ createdAt: -1 })
 

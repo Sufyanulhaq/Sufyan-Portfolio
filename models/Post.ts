@@ -89,7 +89,7 @@ const PostSchema = new Schema<IPost>(
 )
 
 // Indexes for better performance
-PostSchema.index({ slug: 1 })
+// Remove duplicate slug index since unique: true already creates it
 PostSchema.index({ published: 1, createdAt: -1 })
 PostSchema.index({ author: 1 })
 PostSchema.index({ category: 1 })

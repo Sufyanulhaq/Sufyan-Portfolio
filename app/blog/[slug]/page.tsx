@@ -5,9 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CalendarDays, Clock, Eye, Heart, ArrowLeft, Share2, Bookmark } from "lucide-react"
-import connectDB from "@/lib/mongodb"
-import Post from "@/models/Post"
-import Comment from "@/models/Comment"
+
+// Force dynamic rendering to prevent build-time MongoDB connection
+export const dynamic = 'force-dynamic'
+
+// Dynamic imports to prevent build-time analysis
+const connectDB = () => import("@/lib/mongodb").then(m => m.default())
+const Post = () => import("@/models/Post").then(m => m.default)
+const Comment = () => import("@/models/Comment").then(m => m.default)
 
 interface BlogPostPageProps {
   params: {
@@ -19,7 +24,7 @@ async function getBlogPost(slug: string) {
   try {
     await connectDB()
     
-    const post = await Post.findOne({ 
+    const post = await (await Post()).findOne({ 
       slug, 
       published: true 
     }).populate("author", "name email bio avatar")
@@ -29,10 +34,10 @@ async function getBlogPost(slug: string) {
     }
 
     // Increment view count
-    await Post.findByIdAndUpdate(post._id, { $inc: { views: 1 } })
+    await (await Post()).findByIdAndUpdate(post._id, { $inc: { views: 1 } })
 
     // Get comments for this post
-    const comments = await Comment.find({ 
+    const comments = await (await Comment()).find({ 
       post: post._id, 
       isApproved: true 
     }).populate("author", "name").sort({ createdAt: -1 }).lean()
@@ -239,15 +244,4 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   )
 }
 
-export async function generateStaticParams() {
-  try {
-    await connectDB()
-    const posts = await Post.find({ published: true }).select("slug").lean()
-    return posts.map((post) => ({
-      slug: post.slug,
-    }))
-  } catch (error) {
-    console.error("Error generating static params:", error)
-    return []
-  }
-}
+// Removed generateStaticParams since we're using force-dynamic

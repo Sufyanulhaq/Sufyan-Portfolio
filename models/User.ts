@@ -112,7 +112,7 @@ const UserSchema = new Schema<IUser>(
   },
 )
 
-UserSchema.index({ email: 1 })
+// Remove duplicate email index since unique: true already creates it
 UserSchema.index({ role: 1 })
 UserSchema.index({ isActive: 1 })
 UserSchema.index({ createdAt: -1 })
