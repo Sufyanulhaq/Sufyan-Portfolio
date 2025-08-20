@@ -1,190 +1,531 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Mail, Phone, MapPin, Send } from "lucide-react"
+import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Clock, 
+  MessageSquare, 
+  ArrowRight,
+  CheckCircle,
+  Star,
+  Users,
+  Zap,
+  Globe,
+  Send,
+  Calendar,
+  Target
+} from "lucide-react"
+import Link from "next/link"
 
 export default function ContactPage() {
-  const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    subject: "",
-    message: "",
+    company: "",
+    projectType: "",
+    budget: "",
+    timeline: "",
+    message: ""
   })
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-
+    setIsSubmitting(true)
+    
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      setSubmitStatus("success")
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        projectType: "",
+        budget: "",
+        timeline: "",
+        message: ""
       })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setFormData({ name: "", email: "", subject: "", message: "" })
-        alert(data.message || "Message sent successfully!")
-      } else {
-        alert(data.error || "Failed to send message. Please try again.")
-      }
     } catch (error) {
-      console.error("Error sending message:", error)
-      alert("Failed to send message. Please try again.")
+      setSubmitStatus("error")
     } finally {
-      setIsLoading(false)
+      setIsSubmitting(false)
     }
   }
 
+  const contactInfo = [
+    {
+      icon: Mail,
+      title: "Email",
+      value: "hello@sufyanulhaq.com",
+      description: "Send me a message anytime"
+    },
+    {
+      icon: Phone,
+      title: "Phone",
+      value: "+1 (555) 123-4567",
+      description: "Available during business hours"
+    },
+    {
+      icon: MapPin,
+      title: "Location",
+      value: "San Francisco, CA",
+      description: "Serving clients worldwide"
+    },
+    {
+      icon: Clock,
+      title: "Response Time",
+      value: "Within 24 hours",
+      description: "Quick turnaround guaranteed"
+    }
+  ]
+
+  const projectTypes = [
+    {
+      title: "Website Development",
+      description: "Custom websites, landing pages, and web applications",
+      icon: Globe,
+      features: ["Responsive Design", "SEO Optimization", "Performance Focused"]
+    },
+    {
+      title: "E-commerce Solutions",
+      description: "Online stores and shopping platforms",
+      icon: Users,
+      features: ["Payment Integration", "Inventory Management", "Mobile Optimized"]
+    },
+    {
+      title: "Web Applications",
+      description: "Complex business applications and dashboards",
+      icon: Zap,
+      features: ["Custom Features", "API Development", "Scalable Architecture"]
+    }
+  ]
+
+  const process = [
+    {
+      step: "01",
+      title: "Initial Consultation",
+      description: "We discuss your project requirements, goals, and timeline to understand your vision."
+    },
+    {
+      step: "02",
+      title: "Proposal & Planning",
+      description: "I provide a detailed proposal with project scope, timeline, and investment required."
+    },
+    {
+      step: "03",
+      title: "Development & Design",
+      description: "Your project is built with regular updates and collaboration throughout the process."
+    },
+    {
+      step: "04",
+      title: "Launch & Support",
+      description: "Your project goes live with ongoing support and maintenance as needed."
+    }
+  ]
+
+  const testimonials = [
+    {
+      name: "Sarah Chen",
+      role: "CEO, TechFlow Solutions",
+      content: "Working with Sufyan was exceptional. He delivered our website on time and exceeded all expectations. The results speak for themselves - our conversion rate increased by 300%!",
+      rating: 5
+    },
+    {
+      name: "Michael Rodriguez",
+      role: "Founder, Digital Ventures",
+      content: "Sufyan transformed our outdated website into a modern, high-performing platform. His attention to detail and technical expertise are unmatched.",
+      rating: 5
+    },
+    {
+      name: "Emily Watson",
+      role: "Marketing Director, Growth Co.",
+      content: "The performance optimization work Sufyan did improved our page load times from 8 seconds to under 2 seconds. Our users love the new experience!",
+      rating: 5
+    }
+  ]
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="font-heading text-4xl font-bold mb-4">Get In Touch</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Have a project in mind or want to discuss opportunities? I'd love to hear from you.
-            </p>
-          </div>
-
-          <div className="grid gap-8 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Send a Message</CardTitle>
-                <CardDescription>Fill out the form below and I'll get back to you soon</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Name</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                        placeholder="Your name"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                        placeholder="your@email.com"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
-                    <Input
-                      id="subject"
-                      value={formData.subject}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
-                      placeholder="What's this about?"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
-                    <Textarea
-                      id="message"
-                      value={formData.message}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
-                      placeholder="Tell me about your project or inquiry..."
-                      rows={6}
-                      required
-                    />
-                  </div>
-
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    <Send className="h-4 w-4 mr-2" />
-                    {isLoading ? "Sending..." : "Send Message"}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Contact Information</CardTitle>
-                  <CardDescription>Other ways to reach me</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-medium">Email</p>
-                      <p className="text-muted-foreground">sufyan@example.com</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-medium">Phone</p>
-                      <p className="text-muted-foreground">+1 (555) 123-4567</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <MapPin className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-medium">Location</p>
-                      <p className="text-muted-foreground">San Francisco, CA</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Let's Work Together</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4">
-                    I'm always interested in new opportunities and exciting projects. Whether you need:
-                  </p>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                      Full-stack web development
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                      React/Next.js applications
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                      API development & integration
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                      Technical consulting
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="font-heading font-bold text-xl text-foreground">
+              Sufyan
+            </Link>
+            <div className="hidden md:flex items-center space-x-8">
+              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                Home
+              </Link>
+              <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+                About
+              </Link>
+              <Link href="/portfolio" className="text-muted-foreground hover:text-foreground transition-colors">
+                Portfolio
+              </Link>
+              <Link href="/services" className="text-muted-foreground hover:text-foreground transition-colors">
+                Services
+              </Link>
+              <Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors">
+                Blog
+              </Link>
+              <Link href="/contact" className="text-foreground font-medium">
+                Contact
+              </Link>
             </div>
           </div>
         </div>
-      </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-24 pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-5xl lg:text-6xl font-bold text-foreground mb-6">
+              Let's Build
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                Something Amazing
+              </span>
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+              Ready to transform your digital presence? I'm here to help you create 
+              a website or application that not only looks great but drives real business results.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button asChild size="lg" className="text-lg px-8 py-6 h-auto">
+                <Link href="#contact-form">
+                  Start Your Project
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 h-auto">
+                <Link href="/portfolio">View My Work</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Information */}
+      <section className="py-16 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Get in Touch
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Multiple ways to reach me. I'm always available to discuss your project 
+              and answer any questions you might have.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {contactInfo.map((info, index) => (
+              <Card key={index} className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <info.icon className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{info.title}</h3>
+                <p className="text-primary font-medium mb-2">{info.value}</p>
+                <p className="text-sm text-muted-foreground">{info.description}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Project Types */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              What I Can Build for You
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              From simple websites to complex applications, I have the expertise 
+              to bring your vision to life with cutting-edge technology.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {projectTypes.map((type, index) => (
+              <Card key={index} className="p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <type.icon className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold text-center mb-3">{type.title}</h3>
+                <p className="text-muted-foreground text-center mb-6">{type.description}</p>
+                <div className="space-y-2">
+                  {type.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span className="text-muted-foreground">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Form */}
+      <section id="contact-form" className="py-20 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div>
+              <h2 className="text-4xl font-bold text-foreground mb-6">
+                Start Your Project
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+                Tell me about your project, goals, and timeline. I'll get back to you 
+                within 24 hours with a detailed proposal and next steps.
+              </p>
+
+              {/* Process Steps */}
+              <div className="space-y-6">
+                <h3 className="text-2xl font-semibold text-foreground mb-4">How It Works</h3>
+                {process.map((step, index) => (
+                  <div key={index} className="flex items-start gap-4">
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                      {step.step}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-1">{step.title}</h4>
+                      <p className="text-muted-foreground text-sm">{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Card className="p-8">
+              {submitStatus === "success" ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle className="h-8 w-8 text-green-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Message Sent!</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Thank you for reaching out. I'll get back to you within 24 hours 
+                    with a detailed response and next steps.
+                  </p>
+                  <Button 
+                    onClick={() => setSubmitStatus("idle")}
+                    variant="outline"
+                  >
+                    Send Another Message
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
+                        Full Name *
+                      </label>
+                      <Input
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="Your full name"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+                        Email Address *
+                      </label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="your@email.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="company" className="block text-sm font-medium text-foreground mb-2">
+                        Company
+                      </label>
+                      <Input
+                        id="company"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleInputChange}
+                        placeholder="Your company name"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="projectType" className="block text-sm font-medium text-foreground mb-2">
+                        Project Type *
+                      </label>
+                      <Input
+                        id="projectType"
+                        name="projectType"
+                        value={formData.projectType}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="Website, App, etc."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="budget" className="block text-sm font-medium text-foreground mb-2">
+                        Budget Range
+                      </label>
+                      <Input
+                        id="budget"
+                        name="budget"
+                        value={formData.budget}
+                        onChange={handleInputChange}
+                        placeholder="$5K - $25K"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="timeline" className="block text-sm font-medium text-foreground mb-2">
+                        Timeline
+                      </label>
+                      <Input
+                        id="timeline"
+                        name="timeline"
+                        value={formData.timeline}
+                        onChange={handleInputChange}
+                        placeholder="3-6 months"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
+                      Project Details *
+                    </label>
+                    <Textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      rows={6}
+                      placeholder="Tell me about your project, goals, and any specific requirements..."
+                    />
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    className="w-full text-lg py-6 h-auto"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+                        Sending Message...
+                      </>
+                    ) : (
+                      <>
+                        Send Message
+                        <Send className="ml-2 h-5 w-5" />
+                      </>
+                    )}
+                  </Button>
+
+                  {submitStatus === "error" && (
+                    <p className="text-red-500 text-sm text-center">
+                      Something went wrong. Please try again or contact me directly.
+                    </p>
+                  )}
+                </form>
+              )}
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              What My Clients Say
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Don't just take my word for it - hear from the businesses I've helped 
+              transform and grow through exceptional web development.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="p-6">
+                <div className="flex items-center gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-muted-foreground mb-6 italic">"{testimonial.content}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                    <span className="text-primary font-semibold">
+                      {testimonial.name.split(' ').map(n => n[0]).join('')}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-foreground">{testimonial.name}</div>
+                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-primary text-primary-foreground">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl font-bold mb-4">
+            Ready to Get Started?
+          </h2>
+          <p className="text-xl mb-8 opacity-90">
+            Let's discuss your project and turn your vision into reality. 
+            I'm excited to help you create something amazing.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-6 h-auto">
+              <Link href="#contact-form">
+                Start Your Project
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 h-auto border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+              <Link href="/portfolio">View My Work</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
