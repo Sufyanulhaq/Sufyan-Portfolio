@@ -3,6 +3,11 @@ import connectDB from "@/lib/mongodb"
 import { Post, User } from "@/lib/models"
 
 export async function GET(request: NextRequest) {
+  // Prevent build-time execution
+  if (process.env.NODE_ENV === 'production' && !process.env.MONGODB_URI) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 })
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get("page") || "1")
@@ -12,7 +17,10 @@ export async function GET(request: NextRequest) {
     const featured = searchParams.get("featured")
     const skip = (page - 1) * limit
 
-    await connectDB()
+    // Only connect to DB if we're not in build mode
+    if (process.env.MONGODB_URI) {
+      await connectDB()
+    }
 
     // Build query
     const query: any = { published: true }

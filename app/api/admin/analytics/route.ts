@@ -9,6 +9,11 @@ import Comment from "@/models/Comment"
 import UserActivity from "@/models/UserActivity"
 
 export async function GET(request: NextRequest) {
+  // Prevent build-time execution
+  if (process.env.NODE_ENV === 'production' && !process.env.MONGODB_URI) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 })
+  }
+
   try {
     const session = await getServerSession(authOptions)
     
@@ -24,7 +29,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const range = searchParams.get("range") || "7d"
     
-    await connectDB()
+    // Only connect to DB if we're not in build mode
+    if (process.env.MONGODB_URI) {
+      await connectDB()
+    }
 
     // Calculate date ranges
     const now = new Date()
