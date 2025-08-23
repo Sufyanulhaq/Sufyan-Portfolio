@@ -31,14 +31,18 @@ export default function ContactPage() {
     name: "",
     email: "",
     company: "",
-    projectType: "",
+    subject: "New Project Inquiry",
+    message: "",
+    phone: "",
+    website: "",
     budget: "",
     timeline: "",
-    message: ""
+    source: "Website"
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
+  const [errorMessage, setErrorMessage] = useState("")
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -48,22 +52,41 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setErrorMessage("")
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      setSubmitStatus("success")
-      setFormData({
-        name: "",
-        email: "",
-        company: "",
-        projectType: "",
-        budget: "",
-        timeline: "",
-        message: ""
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        setSubmitStatus("success")
+        setFormData({
+          name: "",
+          email: "",
+          company: "",
+          subject: "New Project Inquiry",
+          message: "",
+          phone: "",
+          website: "",
+          budget: "",
+          timeline: "",
+          source: "Website"
+        })
+      } else {
+        setSubmitStatus("error")
+        setErrorMessage(result.error || "Something went wrong. Please try again.")
+      }
     } catch (error) {
+      console.error("Contact form error:", error)
       setSubmitStatus("error")
+      setErrorMessage("Network error. Please check your connection and try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -299,7 +322,7 @@ export default function ContactPage() {
                     Thank you for reaching out. I'll get back to you within 24 hours 
                     with a detailed response and next steps.
                   </p>
-                  <Button 
+                  <Button
                     onClick={() => setSubmitStatus("idle")}
                     variant="outline"
                   >
@@ -352,16 +375,15 @@ export default function ContactPage() {
                       />
                     </div>
                     <div>
-                      <label htmlFor="projectType" className="block text-sm font-medium text-foreground mb-2">
-                        Project Type *
+                      <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
+                        Phone Number
                       </label>
                       <Input
-                        id="projectType"
-                        name="projectType"
-                        value={formData.projectType}
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
                         onChange={handleInputChange}
-                        required
-                        placeholder="Website, App, etc."
+                        placeholder="+44 746 975 3723"
                       />
                     </div>
                   </div>
@@ -376,7 +398,7 @@ export default function ContactPage() {
                         name="budget"
                         value={formData.budget}
                         onChange={handleInputChange}
-                        placeholder="$5K - $25K"
+                        placeholder="£5K - £25K"
                       />
                     </div>
                     <div>
@@ -391,6 +413,19 @@ export default function ContactPage() {
                         placeholder="3-6 months"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="website" className="block text-sm font-medium text-foreground mb-2">
+                      Website (if any)
+                    </label>
+                    <Input
+                      id="website"
+                      name="website"
+                      value={formData.website}
+                      onChange={handleInputChange}
+                      placeholder="https://yourwebsite.com"
+                    />
                   </div>
 
                   <div>
@@ -429,7 +464,7 @@ export default function ContactPage() {
 
                   {submitStatus === "error" && (
                     <p className="text-red-500 text-sm text-center">
-                      Something went wrong. Please try again or contact me directly.
+                      {errorMessage}
                     </p>
                   )}
                 </form>
