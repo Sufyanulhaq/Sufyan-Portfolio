@@ -1,25 +1,55 @@
 "use client"
 
-import { motion } from "framer-motion"
-import type { HTMLAttributes } from "react"
+import { motion, Variants } from "framer-motion"
+import { ReactNode } from "react"
 
-interface FadeInUpProps extends HTMLAttributes<HTMLDivElement> {
+interface FadeInUpProps {
+  children: ReactNode
   delay?: number
   duration?: number
-  distance?: number
+  className?: string
+  once?: boolean
+  amount?: number
 }
 
-export function FadeInUp({ children, delay = 0, duration = 0.6, distance = 60, ...props }: FadeInUpProps) {
+const fadeInUpVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 60,
+    scale: 0.95
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.6,
+      ease: [0.25, 0.46, 0.45, 0.94]
+    }
+  }
+}
+
+export default function FadeInUp({ 
+  children, 
+  delay = 0, 
+  duration = 0.6,
+  className = "",
+  once = true,
+  amount = 0.3
+}: FadeInUpProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: distance }}
-      animate={{ opacity: 1, y: 0 }}
+      variants={fadeInUpVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once, amount }}
+      custom={{ delay, duration }}
+      className={className}
       transition={{
-        duration,
         delay,
-        ease: "easeOut",
+        duration,
+        ease: [0.25, 0.46, 0.45, 0.94]
       }}
-      {...props}
     >
       {children}
     </motion.div>
