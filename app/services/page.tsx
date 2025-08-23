@@ -1,112 +1,165 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Code, Palette, Smartphone, Globe, Database, Zap, ArrowRight, Check, Clock, Users, Target, BarChart3, Shield, Zap as ZapIcon } from "lucide-react"
+import { 
+  Code, 
+  Palette, 
+  Zap, 
+  Globe, 
+  ShoppingCart, 
+  BarChart3, 
+  Smartphone, 
+  ArrowRight,
+  CheckCircle,
+  Clock,
+  Users,
+  Target,
+  Star,
+  TrendingUp
+} from "lucide-react"
 import Link from "next/link"
+import Navbar from "@/components/navbar"
+import Footer from "@/components/footer"
 
 export default function ServicesPage() {
   const services = [
     {
-      icon: Code,
-      title: "Full-Stack Development",
-      description: "End-to-end web application development using cutting-edge technologies and best practices.",
-      features: [
-        "Custom Web Applications",
-        "API Development & Integration",
-        "Database Design & Optimization",
-        "Performance Optimization",
-        "Security Implementation",
-        "Testing & Quality Assurance"
-      ],
-      techStack: ["React", "Next.js", "Node.js", "TypeScript", "PostgreSQL", "MongoDB"],
-      price: "Starting at $8,000",
-      timeline: "6-12 weeks",
-      category: "Development"
-    },
-    {
-      icon: Palette,
-      title: "UI/UX Design",
-      description: "Creating beautiful, intuitive user interfaces that provide exceptional user experiences and drive conversions.",
-      features: [
-        "User Interface Design",
-        "User Experience Research",
-        "Wireframing & Prototyping",
-        "Design Systems",
-        "Responsive Design",
-        "Accessibility Compliance"
-      ],
-      techStack: ["Figma", "Adobe Creative Suite", "Sketch", "InVision", "Principle"],
-      price: "Starting at $3,500",
-      timeline: "3-6 weeks",
-      category: "Design"
-    },
-    {
-      icon: Smartphone,
-      title: "Mobile-First Development",
-      description: "Responsive web applications and progressive web apps that work seamlessly across all devices.",
-      features: [
-        "Responsive Web Design",
-        "Progressive Web Apps (PWA)",
-        "Mobile Optimization",
-        "Cross-platform Solutions",
-        "Touch-friendly Interfaces",
-        "Performance Optimization"
-      ],
-      techStack: ["React Native", "Next.js", "PWA", "Mobile-first CSS", "Touch Events"],
-      price: "Starting at $5,500",
-      timeline: "4-8 weeks",
-      category: "Development"
-    },
-    {
-      icon: Globe,
       title: "Website Development",
-      description: "Professional websites for businesses, portfolios, and e-commerce platforms that convert visitors into customers.",
+      description: "Custom websites built with modern technologies and best practices for optimal performance and user experience.",
+      longDescription: "From simple landing pages to complex web applications, I create websites that not only look stunning but also drive results. Every website is built with SEO in mind, mobile-first responsive design, and performance optimization.",
+      icon: Globe,
+      category: "Development",
+      price: "£2,500 - £15,000",
+      timeline: "2-8 weeks",
+      techStack: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
       features: [
-        "Business Websites",
-        "E-commerce Platforms",
-        "Portfolio Sites",
-        "Landing Pages",
-        "Content Management",
-        "SEO Optimization"
+        "Responsive design for all devices",
+        "SEO optimization and performance",
+        "Content management system",
+        "Analytics and tracking setup",
+        "Ongoing support and maintenance"
       ],
-      techStack: ["Next.js", "WordPress", "Shopify", "Stripe", "Contentful"],
-      price: "Starting at $4,000",
+      benefits: [
+        "Professional online presence",
+        "Improved brand credibility",
+        "Better user engagement",
+        "Higher conversion rates"
+      ]
+    },
+    {
+      title: "E-commerce Solutions",
+      description: "Complete online stores with payment processing, inventory management, and customer analytics.",
+      longDescription: "Transform your business with a powerful e-commerce platform that handles everything from product management to order fulfillment. Built with security and scalability in mind to grow with your business.",
+      icon: ShoppingCart,
+      category: "E-commerce",
+      price: "£8,000 - £25,000",
+      timeline: "6-12 weeks",
+      techStack: ["Next.js", "Stripe", "PostgreSQL", "Redis", "AWS"],
+      features: [
+        "Secure payment processing",
+        "Inventory management system",
+        "Customer account management",
+        "Order tracking and notifications",
+        "Analytics and reporting dashboard"
+      ],
+      benefits: [
+        "24/7 online sales capability",
+        "Reduced operational costs",
+        "Expanded customer reach",
+        "Automated order processing"
+      ]
+    },
+    {
+      title: "Web Applications",
+      description: "Custom business applications and dashboards that streamline operations and improve productivity.",
+      longDescription: "Build powerful web applications that solve specific business problems. From internal tools to customer-facing platforms, I create applications that integrate seamlessly with your existing workflow.",
+      icon: Code,
+      category: "Development",
+      price: "£15,000 - £50,000",
+      timeline: "8-20 weeks",
+      techStack: ["React", "Node.js", "GraphQL", "MongoDB", "Docker"],
+      features: [
+        "Custom feature development",
+        "API integration and development",
+        "User authentication and roles",
+        "Real-time data updates",
+        "Comprehensive testing and deployment"
+      ],
+      benefits: [
+        "Streamlined business processes",
+        "Improved team productivity",
+        "Better data insights",
+        "Competitive advantage"
+      ]
+    },
+    {
+      title: "UI/UX Design",
+      description: "Beautiful, intuitive user interfaces designed to convert visitors into customers.",
+      longDescription: "Create compelling user experiences that guide visitors through your website and encourage them to take action. Every design decision is backed by user research and conversion optimization principles.",
+      icon: Palette,
+      category: "Design",
+      price: "£3,000 - £12,000",
       timeline: "3-6 weeks",
-      category: "Development"
-    },
-    {
-      icon: Database,
-      title: "Backend & API Development",
-      description: "Robust server-side solutions, APIs, and database architecture for scalable applications.",
+      techStack: ["Figma", "Adobe Creative Suite", "Prototyping tools", "User research"],
       features: [
-        "RESTful APIs",
-        "GraphQL APIs",
-        "Database Architecture",
-        "Server Configuration",
-        "Third-party Integrations",
-        "Microservices"
+        "User research and persona development",
+        "Wireframing and prototyping",
+        "Visual design and branding",
+        "User testing and iteration",
+        "Design system creation"
       ],
-      techStack: ["Node.js", "Express", "GraphQL", "PostgreSQL", "Redis", "Docker"],
-      price: "Starting at $6,000",
-      timeline: "5-10 weeks",
-      category: "Development"
+      benefits: [
+        "Improved user satisfaction",
+        "Higher conversion rates",
+        "Reduced user errors",
+        "Better brand perception"
+      ]
     },
     {
+      title: "Performance Optimization",
+      description: "Speed up your existing website and improve Core Web Vitals scores for better SEO and user experience.",
+      longDescription: "Transform slow websites into lightning-fast experiences that users love and search engines reward. I analyze your current performance and implement targeted optimizations for maximum impact.",
       icon: Zap,
-      title: "Performance & SEO",
-      description: "Improving website speed, search engine optimization, and overall performance for better user experience and rankings.",
+      category: "Optimization",
+      price: "£1,500 - £8,000",
+      timeline: "1-4 weeks",
+      techStack: ["Lighthouse", "WebPageTest", "Core Web Vitals", "CDN optimization"],
       features: [
-        "Speed Optimization",
-        "SEO Implementation",
-        "Core Web Vitals",
-        "Code Refactoring",
-        "Performance Monitoring",
-        "Analytics Setup"
+        "Performance audit and analysis",
+        "Image and asset optimization",
+        "Code splitting and bundling",
+        "Caching strategy implementation",
+        "Ongoing performance monitoring"
       ],
-      techStack: ["Lighthouse", "Google Analytics", "Search Console", "WebPageTest", "GTmetrix"],
-      price: "Starting at $2,500",
-      timeline: "2-4 weeks",
-      category: "Optimization"
+      benefits: [
+        "Faster page load times",
+        "Better search engine rankings",
+        "Improved user engagement",
+        "Reduced bounce rates"
+      ]
+    },
+    {
+      title: "Mobile App Development",
+      description: "Native and cross-platform mobile applications that provide seamless user experiences.",
+      longDescription: "Extend your digital presence to mobile devices with apps that work flawlessly across iOS and Android. Built with modern frameworks for optimal performance and user experience.",
+      icon: Smartphone,
+      category: "Development",
+      price: "£12,000 - £40,000",
+      timeline: "10-16 weeks",
+      techStack: ["React Native", "Flutter", "Native iOS/Android", "Firebase"],
+      features: [
+        "Cross-platform compatibility",
+        "Native performance optimization",
+        "Push notifications",
+        "Offline functionality",
+        "App store deployment"
+      ],
+      benefits: [
+        "Mobile-first user experience",
+        "Increased customer engagement",
+        "New revenue opportunities",
+        "Competitive mobile presence"
+      ]
     }
   ]
 
@@ -114,30 +167,53 @@ export default function ServicesPage() {
     {
       step: "01",
       title: "Discovery & Planning",
-      description: "We start by understanding your business goals, target audience, and technical requirements to create a comprehensive project roadmap.",
-      icon: Target,
-      duration: "1-2 weeks"
+      description: "We start by understanding your business goals, target audience, and project requirements. This phase includes research, competitor analysis, and creating a comprehensive project roadmap.",
+      duration: "1-2 weeks",
+      icon: Target
     },
     {
       step: "02",
       title: "Design & Prototyping",
-      description: "Creating wireframes, mockups, and interactive prototypes to visualize the final product before development begins.",
-      icon: Palette,
-      duration: "2-4 weeks"
+      description: "I create wireframes, mockups, and interactive prototypes to visualize your project. We iterate on designs based on your feedback until we achieve the perfect solution.",
+      duration: "2-4 weeks",
+      icon: Palette
     },
     {
       step: "03",
       title: "Development & Testing",
-      description: "Building your application with clean, maintainable code while conducting thorough testing throughout the development process.",
-      icon: Code,
-      duration: "4-12 weeks"
+      description: "Your project is built with clean, maintainable code while conducting thorough testing throughout. Regular updates keep you informed of progress and allow for feedback.",
+      duration: "4-16 weeks",
+      icon: Code
     },
     {
       step: "04",
       title: "Launch & Support",
-      description: "Deploying your project and providing ongoing support, maintenance, and updates to ensure long-term success.",
-      icon: ZapIcon,
-      duration: "Ongoing"
+      description: "Your project goes live with comprehensive testing and quality assurance. I provide ongoing support, maintenance, and updates to ensure long-term success.",
+      duration: "Ongoing",
+      icon: Star
+    }
+  ]
+
+  const whyChooseMe = [
+    {
+      icon: Users,
+      title: "Client-Focused Approach",
+      description: "I work closely with you throughout the entire process, ensuring your vision is realized and your business goals are met."
+    },
+    {
+      icon: TrendingUp,
+      title: "Proven Results",
+      description: "Track record of delivering projects that exceed expectations and drive measurable business results for clients."
+    },
+    {
+      icon: Clock,
+      title: "On-Time Delivery",
+      description: "Committed to meeting deadlines and delivering your project when promised, without compromising on quality."
+    },
+    {
+      icon: CheckCircle,
+      title: "Ongoing Support",
+      description: "Long-term partnership with ongoing support, maintenance, and updates to ensure your project continues to perform."
     }
   ]
 
@@ -145,78 +221,53 @@ export default function ServicesPage() {
     {
       name: "Sarah Chen",
       role: "CEO, TechFlow Solutions",
-      content: "Sufyan transformed our outdated website into a modern, high-performing platform that increased our conversion rate by 300%.",
-      rating: 5
+      content: "Sufyan delivered an exceptional e-commerce platform that exceeded our expectations. Our online sales increased by 300% within the first month!",
+      rating: 5,
+      service: "E-commerce Development"
     },
     {
       name: "Michael Rodriguez",
       role: "Founder, Digital Ventures",
-      content: "Working with Sufyan was exceptional. He delivered our e-commerce platform on time and exceeded all expectations.",
-      rating: 5
+      content: "The performance optimization work Sufyan did transformed our website from slow to lightning-fast. Our bounce rate dropped by 40%!",
+      rating: 5,
+      service: "Performance Optimization"
     },
     {
       name: "Emily Watson",
       role: "Marketing Director, Growth Co.",
-      content: "The performance optimization work Sufyan did improved our page load times from 8 seconds to under 2 seconds.",
-      rating: 5
+      content: "Working with Sufyan was a game-changer. He built a custom dashboard that gives us insights we never had before.",
+      rating: 5,
+      service: "Web Application Development"
     }
   ]
 
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="font-heading font-bold text-xl text-foreground">
-              Sufyan
-            </Link>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                Home
-              </Link>
-              <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
-                About
-              </Link>
-              <Link href="/portfolio" className="text-muted-foreground hover:text-foreground transition-colors">
-                Portfolio
-              </Link>
-              <Link href="/services" className="text-foreground font-medium">
-                Services
-              </Link>
-              <Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors">
-                Blog
-              </Link>
-              <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-5xl lg:text-6xl font-bold text-foreground mb-6">
-              Professional Web Development
+              Professional
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-                Services
+                Web Services
               </span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              From concept to deployment, I deliver high-quality web solutions that drive business growth, 
-              enhance user experience, and establish your digital presence in the competitive online landscape.
+              Comprehensive web development solutions designed to transform your digital presence 
+              and drive real business results. From concept to deployment, I handle every aspect.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button asChild size="lg" className="text-lg px-8 py-6 h-auto">
+              <Button asChild size="hero" className="text-lg">
                 <Link href="/contact">
                   Start Your Project
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 h-auto">
+              <Button asChild variant="outline" size="hero" className="text-lg">
                 <Link href="/portfolio">View My Work</Link>
               </Button>
             </div>
@@ -225,20 +276,21 @@ export default function ServicesPage() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-20 bg-muted/30">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              Comprehensive Development Services
+              What I Offer
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              I offer a full spectrum of web development services to meet your business needs and exceed your expectations.
+              A comprehensive range of web development services tailored to meet your specific needs 
+              and business objectives.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">
             {services.map((service, index) => (
-              <Card key={index} className="p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <Card key={index} className="p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
                 <div className="flex items-start gap-6">
                   <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
                     <service.icon className="h-8 w-8 text-primary" />
@@ -248,49 +300,64 @@ export default function ServicesPage() {
                       <h3 className="text-2xl font-bold text-foreground">{service.title}</h3>
                       <Badge variant="secondary">{service.category}</Badge>
                     </div>
-                    <p className="text-muted-foreground mb-6 leading-relaxed">{service.description}</p>
+                    <p className="text-muted-foreground mb-4 leading-relaxed">{service.longDescription}</p>
                     
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                          <Check className="h-4 w-4 text-green-500" />
-                          Key Features
-                        </h4>
-                        <ul className="space-y-2">
-                          {service.features.map((feature, idx) => (
-                            <li key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                          <Code className="h-4 w-4 text-blue-500" />
-                          Tech Stack
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {service.techStack.map((tech, idx) => (
-                            <Badge key={idx} variant="outline" className="text-xs">
-                              {tech}
-                            </Badge>
-                          ))}
-                        </div>
-                        
-                        <div className="mt-4 space-y-2">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Starting Price:</span>
-                            <span className="font-semibold text-foreground">{service.price}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Timeline:</span>
-                            <span className="font-semibold text-foreground">{service.timeline}</span>
-                          </div>
-                        </div>
+                    {/* Tech Stack */}
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-foreground mb-2">Technologies Used:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {service.techStack.map((tech, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {tech}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
+
+                    {/* Pricing & Timeline */}
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className="text-sm">
+                        <span className="text-muted-foreground">Investment:</span>
+                        <div className="font-semibold text-foreground">{service.price}</div>
+                      </div>
+                      <div className="text-sm">
+                        <span className="text-muted-foreground">Timeline:</span>
+                        <div className="font-semibold text-foreground">{service.timeline}</div>
+                      </div>
+                    </div>
+
+                    {/* Features */}
+                    <div className="mb-6">
+                      <h4 className="font-semibold text-foreground mb-2">What's Included:</h4>
+                      <ul className="space-y-1">
+                        {service.features.map((feature, idx) => (
+                          <li key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
+                            <CheckCircle className="h-3 w-3 text-green-500" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Benefits */}
+                    <div className="mb-6">
+                      <h4 className="font-semibold text-foreground mb-2">Business Benefits:</h4>
+                      <ul className="space-y-1">
+                        {service.benefits.map((benefit, idx) => (
+                          <li key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
+                            <TrendingUp className="h-3 w-3 text-blue-500" />
+                            {benefit}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <Button asChild size="cta" className="w-full">
+                      <Link href="/contact">
+                        Get Started
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </Card>
@@ -300,98 +367,72 @@ export default function ServicesPage() {
       </section>
 
       {/* Process Section */}
-      <section className="py-20">
+      <section className="py-20 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
               My Development Process
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              A proven methodology that ensures quality, transparency, and on-time delivery for every project.
+              A proven methodology that ensures quality, transparency, and on-time delivery 
+              for every project.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {process.map((step, index) => (
-              <div key={index} className="text-center relative">
-                {index < process.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-1/2 w-full h-0.5 bg-border transform translate-x-1/2" />
-                )}
-                <div className="relative z-10">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-xl">
-                    {step.step}
-                  </div>
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <step.icon className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
-                  <p className="text-muted-foreground mb-3 leading-relaxed">{step.description}</p>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
-                    <Clock className="h-4 w-4" />
-                    {step.duration}
-                  </div>
+              <div key={index} className="text-center">
+                <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl">
+                  {step.step}
                 </div>
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <step.icon className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
+                <p className="text-muted-foreground mb-3 leading-relaxed">{step.description}</p>
+                <Badge variant="outline">{step.duration}</Badge>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Why Choose Me Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Why Choose Me for Your Project?
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              I bring a unique combination of technical expertise, creative vision, and business understanding to every project.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="p-6 text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Users className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Client-Focused Approach</h3>
-              <p className="text-muted-foreground">
-                Every project is built around your specific needs, goals, and vision. I work closely with you to ensure the final product exceeds expectations.
-              </p>
-            </Card>
-
-            <Card className="p-6 text-center">
-              <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Shield className="h-8 w-8 text-green-500" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Quality & Reliability</h3>
-              <p className="text-muted-foreground">
-                I maintain the highest standards of code quality, performance, and security. Your project is built to last and scale with your business.
-              </p>
-            </Card>
-
-            <Card className="p-6 text-center">
-              <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <BarChart3 className="h-8 w-8 text-purple-500" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Results-Driven</h3>
-              <p className="text-muted-foreground">
-                I don't just build websites - I build digital solutions that drive business growth, improve user experience, and deliver measurable results.
-              </p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
+      {/* Why Choose Me */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              What My Clients Say
+              Why Choose Me
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Don't just take my word for it - hear from the businesses I've helped transform and grow.
+              What sets me apart from other developers and ensures your project's success.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {whyChooseMe.map((reason, index) => (
+              <Card key={index} className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <reason.icon className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">{reason.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{reason.description}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Client Success Stories
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Don't just take my word for it - hear from the businesses I've helped 
+              transform through exceptional web development.
             </p>
           </div>
 
@@ -400,20 +441,25 @@ export default function ServicesPage() {
               <Card key={index} className="p-6">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Check key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <p className="text-muted-foreground mb-6 italic">"{testimonial.content}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-primary font-semibold">
-                      {testimonial.name.split(' ').map(n => n[0]).join('')}
-                    </span>
+                <p className="text-muted-foreground mb-4 italic">"{testimonial.content}"</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      <span className="text-primary font-semibold">
+                        {testimonial.name.split(' ').map(n => n[0]).join('')}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-foreground">{testimonial.name}</div>
+                      <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-semibold text-foreground">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {testimonial.service}
+                  </Badge>
                 </div>
               </Card>
             ))}
@@ -425,26 +471,28 @@ export default function ServicesPage() {
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold mb-4">
-            Ready to Start Your Project?
+            Ready to Transform Your Digital Presence?
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Let's discuss your vision and turn it into a powerful digital solution that drives results.
+            Let's discuss your project and see how I can help bring your vision to life. 
+            I'm excited to create something amazing together.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-6 h-auto">
+            <Button asChild size="hero" variant="secondary" className="text-lg">
               <Link href="/contact">
-                Get Started Today
+                Start Your Project
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 h-auto border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-              <Link href="/portfolio">
-                View My Work
-              </Link>
+            <Button asChild size="hero" variant="outline" className="text-lg border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+              <Link href="/portfolio">View My Work</Link>
             </Button>
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

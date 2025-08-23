@@ -1,36 +1,36 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { 
   Search, 
+  Filter, 
+  ExternalLink, 
+  User, 
   Calendar, 
   Clock, 
-  User, 
-  Tag, 
+  TrendingUp, 
   ArrowRight,
-  TrendingUp,
-  Code,
-  Palette,
-  Zap,
   BookOpen,
-  ExternalLink
+  Tag,
+  Eye,
+  Heart
 } from "lucide-react"
 import Link from "next/link"
+import Navbar from "@/components/navbar"
+import Footer from "@/components/footer"
 
 interface BlogPost {
   id: string
   title: string
   excerpt: string
   content: string
-  slug: string
   author: {
     name: string
-    avatar: string
     role: string
   }
   category: string
@@ -41,6 +41,7 @@ interface BlogPost {
   views: number
   likes: number
   coverImage: string
+  slug: string
 }
 
 export default function BlogPage() {
@@ -51,167 +52,121 @@ export default function BlogPage() {
   const blogPosts: BlogPost[] = [
     {
       id: "1",
-      title: "My Tech Stack in 2025: What I Use and Why",
-      excerpt: "A deep dive into the technologies, frameworks, and tools that power my development workflow in 2025. From frontend frameworks to deployment strategies, discover what's working for me and why.",
-      content: "In the ever-evolving landscape of web development, staying current with the latest technologies is crucial for delivering exceptional results. After years of experimentation and real-world testing, I've refined my tech stack to focus on tools that provide the best developer experience, performance, and maintainability...",
-      slug: "tech-stack-2025",
+      title: "Building High-Performance React Applications",
+      excerpt: "Learn the essential techniques for optimizing React applications, from code splitting to memoization strategies that will make your apps lightning fast.",
+      content: "Full article content here...",
       author: {
         name: "Sufyan Ul Haq",
-        avatar: "/professional-developer-portrait.png",
         role: "Full-Stack Developer"
       },
       category: "Development",
-      tags: ["Tech Stack", "Frameworks", "Tools", "2025", "Best Practices"],
+      tags: ["React", "Performance", "Optimization", "JavaScript"],
       publishedAt: "2025-01-15",
       readTime: "8 min read",
       featured: true,
       views: 2847,
       likes: 156,
-      coverImage: "/modern-portfolio-website.png"
+      coverImage: "/modern-portfolio-website.png",
+      slug: "building-high-performance-react-applications"
     },
     {
       id: "2",
-      title: "From Brief to Launch: How I Build High-Performing Client Websites",
-      excerpt: "Walk through my complete development process, from initial client consultation to final deployment. Learn the strategies and methodologies that ensure project success.",
-      content: "Building a successful website isn't just about writing code—it's about understanding business objectives, user needs, and technical requirements. Over the years, I've developed a systematic approach that transforms client briefs into high-performing digital solutions...",
-      slug: "brief-to-launch-process",
+      title: "The Future of Web Development: AI Integration",
+      excerpt: "Explore how artificial intelligence is transforming web development and what it means for developers and businesses in the coming years.",
+      content: "Full article content here...",
       author: {
         name: "Sufyan Ul Haq",
-        avatar: "/professional-developer-portrait.png",
         role: "Full-Stack Developer"
       },
-      category: "Process",
-      tags: ["Client Work", "Development Process", "Project Management", "Methodology"],
+      category: "Technology",
+      tags: ["AI", "Web Development", "Future", "Innovation"],
       publishedAt: "2025-01-10",
       readTime: "12 min read",
       featured: true,
       views: 2156,
-      likes: 134,
-      coverImage: "/task-management-app.png"
+      likes: 98,
+      coverImage: "/modern-ecommerce-dashboard.png",
+      slug: "future-of-web-development-ai-integration"
     },
     {
       id: "3",
-      title: "Performance Optimization: The Secret Sauce of Modern Web Development",
-      excerpt: "Explore advanced techniques for optimizing website performance, from Core Web Vitals to server-side optimizations. Learn how to build lightning-fast websites that users love.",
-      content: "In today's digital landscape, performance isn't just a nice-to-have—it's a critical factor that directly impacts user experience, conversion rates, and search engine rankings. Users expect websites to load in under 2 seconds, and search engines prioritize fast-loading pages...",
-      slug: "performance-optimization-secrets",
+      title: "SEO Best Practices for 2025",
+      excerpt: "Stay ahead of the competition with these proven SEO strategies that will improve your website's search engine rankings and drive organic traffic.",
+      content: "Full article content here...",
       author: {
         name: "Sufyan Ul Haq",
-        avatar: "/professional-developer-portrait.png",
         role: "Full-Stack Developer"
       },
-      category: "Performance",
-      tags: ["Performance", "Core Web Vitals", "Optimization", "Speed", "SEO"],
+      category: "SEO",
+      tags: ["SEO", "Marketing", "Traffic", "Google"],
       publishedAt: "2025-01-05",
       readTime: "10 min read",
       featured: true,
       views: 1892,
-      likes: 98,
-      coverImage: "/weather-dashboard.png"
+      likes: 87,
+      coverImage: "/task-management-app.png",
+      slug: "seo-best-practices-2025"
     },
     {
       id: "4",
-      title: "Building Scalable APIs: Lessons from Production",
-      excerpt: "Real-world insights from building and maintaining APIs that serve millions of requests. Discover the architecture patterns and best practices that ensure scalability and reliability.",
-      content: "Building APIs that can handle production traffic is a different beast from creating simple endpoints. Over the years, I've learned valuable lessons about designing APIs that scale, handle errors gracefully, and provide excellent developer experience...",
-      slug: "scalable-apis-production-lessons",
+      title: "Mastering TypeScript: Advanced Patterns",
+      excerpt: "Dive deep into advanced TypeScript patterns and techniques that will make your code more robust, maintainable, and type-safe.",
+      content: "Full article content here...",
       author: {
         name: "Sufyan Ul Haq",
-        avatar: "/professional-developer-portrait.png",
         role: "Full-Stack Developer"
       },
-      category: "Backend",
-      tags: ["APIs", "Scalability", "Production", "Architecture", "Best Practices"],
+      category: "Development",
+      tags: ["TypeScript", "Programming", "Advanced", "Patterns"],
       publishedAt: "2024-12-28",
       readTime: "15 min read",
       featured: false,
       views: 1456,
-      likes: 87,
-      coverImage: "/modern-ecommerce-dashboard.png"
+      likes: 73,
+      coverImage: "/weather-dashboard.png",
+      slug: "mastering-typescript-advanced-patterns"
     },
     {
       id: "5",
-      title: "The Future of Frontend: What's Next in 2025 and Beyond",
-      excerpt: "Predictions and insights about the future of frontend development. From new frameworks to emerging patterns, discover what's shaping the next generation of web applications.",
-      content: "Frontend development is evolving at an unprecedented pace. New frameworks, tools, and patterns emerge regularly, each promising to revolutionize how we build user interfaces. As we move into 2025, several trends are becoming clear...",
-      slug: "future-frontend-2025",
+      title: "Building Scalable Microservices Architecture",
+      excerpt: "Learn how to design and implement microservices that can scale with your business needs while maintaining performance and reliability.",
+      content: "Full article content here...",
       author: {
         name: "Sufyan Ul Haq",
-        avatar: "/professional-developer-portrait.png",
         role: "Full-Stack Developer"
       },
-      category: "Frontend",
-      tags: ["Frontend", "Future", "Trends", "Frameworks", "Innovation"],
+      category: "Backend",
+      tags: ["Microservices", "Architecture", "Scalability", "Backend"],
       publishedAt: "2024-12-20",
-      readTime: "9 min read",
+      readTime: "18 min read",
       featured: false,
       views: 1234,
-      likes: 76,
-      coverImage: "/real-estate-platform.png"
+      likes: 65,
+      coverImage: "/real-estate-platform.png",
+      slug: "building-scalable-microservices-architecture"
     },
     {
       id: "6",
-      title: "Database Design Patterns for Modern Applications",
-      excerpt: "Essential database design patterns that every developer should know. Learn how to structure your data for performance, scalability, and maintainability.",
-      content: "Database design is often overlooked in the excitement of building features, but it's the foundation that determines your application's performance and scalability. Poor database design can lead to slow queries, data inconsistencies, and maintenance nightmares...",
-      slug: "database-design-patterns",
+      title: "Optimizing Database Performance for Web Applications",
+      excerpt: "Discover proven techniques for optimizing database queries, indexing strategies, and connection management to improve your application's performance.",
+      content: "Full article content here...",
       author: {
         name: "Sufyan Ul Haq",
-        avatar: "/professional-developer-portrait.png",
         role: "Full-Stack Developer"
       },
       category: "Database",
-      tags: ["Database", "Design Patterns", "Performance", "Scalability", "Architecture"],
+      tags: ["Database", "Performance", "SQL", "Optimization"],
       publishedAt: "2024-12-15",
-      readTime: "11 min read",
-      featured: false,
-      views: 987,
-      likes: 65,
-      coverImage: "/modern-ecommerce-dashboard.png"
-    },
-    {
-      id: "7",
-      title: "SEO for Developers: Technical Implementation Guide",
-      excerpt: "A comprehensive guide to implementing SEO best practices in your code. Learn how to build websites that search engines love and users can find easily.",
-      content: "Search Engine Optimization isn't just about content—it's about building websites that search engines can understand and index effectively. As developers, we have a crucial role in implementing the technical foundations of SEO...",
-      slug: "seo-for-developers-guide",
-      author: {
-        name: "Sufyan Ul Haq",
-        avatar: "/professional-developer-portrait.png",
-        role: "Full-Stack Developer"
-      },
-      category: "SEO",
-      tags: ["SEO", "Technical SEO", "Search Engines", "Performance", "Best Practices"],
-      publishedAt: "2024-12-10",
-      readTime: "13 min read",
-      featured: false,
-      views: 876,
-      likes: 54,
-      coverImage: "/modern-portfolio-website.png"
-    },
-    {
-      id: "8",
-      title: "Testing Strategies for Full-Stack Applications",
-      excerpt: "Comprehensive testing strategies that ensure your applications are reliable, maintainable, and bug-free. From unit tests to end-to-end testing, cover all your bases.",
-      content: "Testing is often the first thing to be sacrificed when deadlines loom, but it's also the most important investment you can make in your codebase. Well-tested applications are easier to maintain, debug, and extend...",
-      slug: "testing-strategies-fullstack",
-      author: {
-        name: "Sufyan Ul Haq",
-        avatar: "/professional-developer-portrait.png",
-        role: "Full-Stack Developer"
-      },
-      category: "Testing",
-      tags: ["Testing", "Unit Tests", "Integration Tests", "E2E", "Quality"],
-      publishedAt: "2024-12-05",
       readTime: "14 min read",
       featured: false,
-      views: 765,
-      likes: 43,
-      coverImage: "/task-management-app.png"
+      views: 987,
+      likes: 52,
+      coverImage: "/modern-portfolio-website.png",
+      slug: "optimizing-database-performance-web-applications"
     }
   ]
 
-  const categories = ["all", "Development", "Process", "Performance", "Backend", "Frontend", "Database", "SEO", "Testing"]
+  const categories = ["all", "Development", "Technology", "SEO", "Backend", "Database", "Frontend", "Design"]
   const featuredPosts = blogPosts.filter(post => post.featured)
   const recentPosts = blogPosts.slice(0, 3)
 
@@ -226,7 +181,7 @@ export default function BlogPage() {
   })
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('en-GB', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -236,35 +191,7 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="font-heading font-bold text-xl text-foreground">
-              Sufyan
-            </Link>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                Home
-              </Link>
-              <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
-                About
-              </Link>
-              <Link href="/portfolio" className="text-muted-foreground hover:text-foreground transition-colors">
-                Portfolio
-              </Link>
-              <Link href="/services" className="text-muted-foreground hover:text-foreground transition-colors">
-                Services
-              </Link>
-              <Link href="/blog" className="text-foreground font-medium">
-                Blog
-              </Link>
-              <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="pt-24 pb-16">
@@ -424,7 +351,7 @@ export default function BlogPage() {
                       <span>{post.author.name}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <TrendingUp className="h-4 w-4" />
+                      <Eye className="h-4 w-4" />
                       <span>{post.views} views</span>
                     </div>
                   </div>
@@ -444,13 +371,13 @@ export default function BlogPage() {
 
                   {/* Action Buttons */}
                   <div className="flex items-center gap-3">
-                    <Button asChild size="sm" className="flex-1">
+                    <Button asChild size="cta" className="flex-1">
                       <Link href={`/blog/${post.slug}`}>
                         Read Article
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
-                    <Button asChild variant="outline" size="sm">
+                    <Button asChild variant="outline" size="cta">
                       <Link href={`/blog/${post.slug}`}>
                         <ExternalLink className="h-4 w-4 mr-2" />
                         View
@@ -497,13 +424,13 @@ export default function BlogPage() {
             Never miss valuable insights that can help you grow.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-6 h-auto">
+            <Button asChild size="hero" variant="secondary" className="text-lg">
               <Link href="/contact">
                 Get in Touch
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 h-auto border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Button asChild size="hero" variant="outline" className="text-lg border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
               <Link href="/portfolio">
                 View My Work
               </Link>
@@ -511,6 +438,9 @@ export default function BlogPage() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }
