@@ -2,8 +2,7 @@
 
 import { useState } from "react"
 
-// Force dynamic rendering to prevent build-time prerendering issues
-export const dynamic = 'force-dynamic'
+
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
