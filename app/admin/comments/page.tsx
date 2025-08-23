@@ -1,5 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+
+// Force dynamic rendering to prevent build-time MongoDB connection
+export const dynamic = 'force-dynamic'
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Check, X, Trash2, MessageSquare } from "lucide-react"

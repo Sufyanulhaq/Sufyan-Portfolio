@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { FileText, FolderOpen, Users, Eye, Heart, MessageSquare, BarChart3 } from "lucide-react"
 import Link from "next/link"
-import Button from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 
 // Force dynamic rendering to prevent build-time MongoDB connection
 export const dynamic = 'force-dynamic'
