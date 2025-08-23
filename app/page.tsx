@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card"
 import { ArrowRight, Code, Palette, Zap, Star, TrendingUp, Users, Globe, Award, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
+import Footer from "@/components/footer"
 import BlogSection from "@/components/blog-section"
 
 // Force dynamic rendering to prevent build-time data fetching
@@ -44,13 +45,13 @@ export default async function HomePage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button asChild size="lg" className="text-lg px-8 py-6 h-auto">
+              <Button asChild size="hero" className="text-lg">
                 <Link href="/portfolio">
                   View My Work
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 h-auto">
+              <Button asChild variant="outline" size="hero" className="text-lg">
                 <Link href="/contact">
                   Start a Project
                 </Link>
@@ -58,7 +59,7 @@ export default async function HomePage() {
             </div>
 
             {/* Social Proof */}
-            <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500" />
                 <span>50+ Projects Delivered</span>
@@ -248,7 +249,7 @@ export default async function HomePage() {
                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">Node.js</span>
                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">MongoDB</span>
                 </div>
-                <Button asChild variant="outline" className="w-full">
+                <Button asChild variant="outline" size="cta" className="w-full">
                   <Link href="/portfolio">View Project</Link>
                 </Button>
               </div>
@@ -269,7 +270,7 @@ export default async function HomePage() {
                   <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Stripe</span>
                   <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">PostgreSQL</span>
                 </div>
-                <Button asChild variant="outline" className="w-full">
+                <Button asChild variant="outline" size="cta" className="w-full">
                   <Link href="/portfolio">View Project</Link>
                 </Button>
               </div>
@@ -290,7 +291,7 @@ export default async function HomePage() {
                   <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">Laravel</span>
                   <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">MySQL</span>
                 </div>
-                <Button asChild variant="outline" className="w-full">
+                <Button asChild variant="outline" size="cta" className="w-full">
                   <Link href="/portfolio">View Project</Link>
                 </Button>
               </div>
@@ -298,7 +299,7 @@ export default async function HomePage() {
           </div>
 
           <div className="text-center">
-            <Button asChild size="lg" className="text-lg px-8 py-6 h-auto">
+            <Button asChild size="hero" className="text-lg">
               <Link href="/portfolio">
                 View All Projects
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -410,13 +411,13 @@ export default async function HomePage() {
             Let's discuss your project and turn your vision into reality. I'm here to help you succeed.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-6 h-auto">
+            <Button asChild size="hero" variant="secondary" className="text-lg">
               <Link href="/contact">
                 Start Your Project
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 h-auto border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Button asChild size="hero" variant="outline" className="text-lg border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
               <Link href="/portfolio">
                 View My Work
               </Link>
@@ -424,6 +425,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

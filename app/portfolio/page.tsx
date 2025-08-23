@@ -24,6 +24,8 @@ import {
   Target
 } from "lucide-react"
 import Link from "next/link"
+import Navbar from "@/components/navbar"
+import Footer from "@/components/footer"
 
 interface Project {
   id: string
@@ -276,35 +278,7 @@ export default function PortfolioPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="font-heading font-bold text-xl text-foreground">
-              Sufyan
-            </Link>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                Home
-              </Link>
-              <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
-                About
-              </Link>
-              <Link href="/portfolio" className="text-foreground font-medium">
-                Portfolio
-              </Link>
-              <Link href="/services" className="text-muted-foreground hover:text-foreground transition-colors">
-                Services
-              </Link>
-              <Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors">
-                Blog
-              </Link>
-              <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="pt-24 pb-16">
@@ -513,7 +487,7 @@ export default function PortfolioPage() {
                   {/* Action Buttons */}
                   <div className="flex items-center gap-3">
                     {project.liveUrl && (
-                      <Button asChild size="sm" className="flex-1">
+                      <Button asChild size="cta" className="flex-1">
                         <Link href={project.liveUrl} target="_blank" rel="noopener noreferrer">
                           <Globe className="h-4 w-4 mr-2" />
                           Live Demo
@@ -521,7 +495,7 @@ export default function PortfolioPage() {
                       </Button>
                     )}
                     {project.githubUrl && (
-                      <Button asChild variant="outline" size="sm">
+                      <Button asChild variant="outline" size="cta">
                         <Link href={project.githubUrl} target="_blank" rel="noopener noreferrer">
                           <Github className="h-4 w-4 mr-2" />
                           Code
@@ -570,13 +544,13 @@ export default function PortfolioPage() {
             I'm here to help bring your ideas to life.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-6 h-auto">
+            <Button asChild size="hero" variant="secondary" className="text-lg">
               <Link href="/contact">
                 Start Your Project
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 h-auto border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Button asChild size="hero" variant="outline" className="text-lg border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
               <Link href="/services">
                 View Services
               </Link>
@@ -584,6 +558,9 @@ export default function PortfolioPage() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

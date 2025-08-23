@@ -23,6 +23,8 @@ import {
   Target
 } from "lucide-react"
 import Link from "next/link"
+import Navbar from "@/components/navbar"
+import Footer from "@/components/footer"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -77,13 +79,13 @@ export default function ContactPage() {
     {
       icon: Phone,
       title: "Phone",
-      value: "+1 (555) 123-4567",
+      value: "+44 746 975 3723",
       description: "Available during business hours"
     },
     {
       icon: MapPin,
       title: "Location",
-      value: "San Francisco, CA",
+      value: "Liverpool, UK",
       description: "Serving clients worldwide"
     },
     {
@@ -162,35 +164,7 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="font-heading font-bold text-xl text-foreground">
-              Sufyan
-            </Link>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                Home
-              </Link>
-              <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
-                About
-              </Link>
-              <Link href="/portfolio" className="text-muted-foreground hover:text-foreground transition-colors">
-                Portfolio
-              </Link>
-              <Link href="/services" className="text-muted-foreground hover:text-foreground transition-colors">
-                Services
-              </Link>
-              <Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors">
-                Blog
-              </Link>
-              <Link href="/contact" className="text-foreground font-medium">
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="pt-24 pb-16">
@@ -207,13 +181,13 @@ export default function ContactPage() {
               a website or application that not only looks great but drives real business results.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button asChild size="lg" className="text-lg px-8 py-6 h-auto">
+              <Button asChild size="hero" className="text-lg">
                 <Link href="#contact-form">
                   Start Your Project
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 h-auto">
+              <Button asChild variant="outline" size="hero" className="text-lg">
                 <Link href="/portfolio">View My Work</Link>
               </Button>
             </div>
@@ -436,7 +410,8 @@ export default function ContactPage() {
 
                   <Button 
                     type="submit" 
-                    className="w-full text-lg py-6 h-auto"
+                    size="cta"
+                    className="w-full"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -514,18 +489,21 @@ export default function ContactPage() {
             I'm excited to help you create something amazing.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-6 h-auto">
+            <Button asChild size="hero" variant="secondary" className="text-lg">
               <Link href="#contact-form">
                 Start Your Project
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 h-auto border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Button asChild size="hero" variant="outline" className="text-lg border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
               <Link href="/portfolio">View My Work</Link>
             </Button>
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }
