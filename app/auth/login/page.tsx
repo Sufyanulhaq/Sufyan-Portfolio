@@ -28,24 +28,36 @@ export default function LoginPage() {
     setError("")
 
     try {
+      console.log("Attempting to sign in with:", { email, password: "***" })
+      
       const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       })
 
+      console.log("Sign in result:", result)
+
       if (result?.error) {
-        setError("Invalid credentials")
-      } else {
+        setError(`Login failed: ${result.error}`)
+      } else if (result?.ok) {
+        console.log("Sign in successful, getting session...")
         const session = await getSession()
-        if (session?.user?.role === "ADMIN") {
+        console.log("Session:", session)
+        
+        if (session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "ADMIN") {
+          console.log("Redirecting to admin...")
           router.push("/admin")
         } else {
+          console.log("Redirecting to home...")
           router.push("/")
         }
+      } else {
+        setError("Login failed - no result returned")
       }
     } catch (error) {
-      setError("An error occurred. Please try again.")
+      console.error("Login error:", error)
+      setError(`An error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setIsLoading(false)
     }
@@ -100,6 +112,12 @@ export default function LoginPage() {
             <Link href="/auth/register" className="text-primary hover:underline">
               Sign up
             </Link>
+          </div>
+
+          <div className="mt-4 p-3 bg-muted rounded-lg text-xs text-muted-foreground">
+            <p><strong>Test Credentials:</strong></p>
+            <p>Email: sufyan@example.com</p>
+            <p>Password: admin123</p>
           </div>
         </CardContent>
       </Card>

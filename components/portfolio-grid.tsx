@@ -140,24 +140,7 @@ export function PortfolioGrid() {
                     alt={project.title}
                     className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div
-                    className={`absolute inset-0 bg-black/60 flex items-center justify-center space-x-4 transition-opacity duration-300 ${
-                      hoveredProject === project.id ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    <Button size="sm" variant="secondary" asChild>
-                      <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-                        <Eye className="h-4 w-4 mr-2" />
-                        Live Demo
-                      </a>
-                    </Button>
-                    <Button size="sm" variant="secondary" asChild>
-                      <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                        <Github className="h-4 w-4 mr-2" />
-                        Code
-                      </a>
-                    </Button>
-                  </div>
+
                 </div>
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-3">
@@ -199,22 +182,7 @@ export function PortfolioGrid() {
                     alt={project.title}
                     className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div
-                    className={`absolute inset-0 bg-black/60 flex items-center justify-center space-x-2 transition-opacity duration-300 ${
-                      hoveredProject === project.id ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    <Button size="sm" variant="secondary" asChild>
-                      <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-                        <Eye className="h-4 w-4" />
-                      </a>
-                    </Button>
-                    <Button size="sm" variant="secondary" asChild>
-                      <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                        <Github className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  </div>
+
                 </div>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">

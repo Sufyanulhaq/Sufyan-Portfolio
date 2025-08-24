@@ -28,6 +28,7 @@ export default function ServicesPage() {
       description: "Custom websites built with modern technologies and best practices for optimal performance and user experience.",
       longDescription: "From simple landing pages to complex web applications, I create websites that not only look stunning but also drive results. Every website is built with SEO in mind, mobile-first responsive design, and performance optimization.",
       icon: Globe,
+      image: "/images/services/web-development.jpg",
       category: "Development",
       price: "£2,500 - £15,000",
       timeline: "2-8 weeks",
@@ -51,6 +52,7 @@ export default function ServicesPage() {
       description: "Complete online stores with payment processing, inventory management, and customer analytics.",
       longDescription: "Transform your business with a powerful e-commerce platform that handles everything from product management to order fulfillment. Built with security and scalability in mind to grow with your business.",
       icon: ShoppingCart,
+      image: "/images/services/ecommerce.jpg",
       category: "E-commerce",
       price: "£8,000 - £25,000",
       timeline: "6-12 weeks",
@@ -74,6 +76,7 @@ export default function ServicesPage() {
       description: "Custom business applications and dashboards that streamline operations and improve productivity.",
       longDescription: "Build powerful web applications that solve specific business problems. From internal tools to customer-facing platforms, I create applications that integrate seamlessly with your existing workflow.",
       icon: Code,
+      image: "/images/services/web-apps.jpg",
       category: "Development",
       price: "£15,000 - £50,000",
       timeline: "8-20 weeks",
@@ -97,6 +100,7 @@ export default function ServicesPage() {
       description: "Beautiful, intuitive user interfaces designed to convert visitors into customers.",
       longDescription: "Create compelling user experiences that guide visitors through your website and encourage them to take action. Every design decision is backed by user research and conversion optimization principles.",
       icon: Palette,
+      image: "/images/services/ui-ux-design.jpg",
       category: "Design",
       price: "£3,000 - £12,000",
       timeline: "3-6 weeks",
@@ -120,6 +124,7 @@ export default function ServicesPage() {
       description: "Speed up your existing website and improve Core Web Vitals scores for better SEO and user experience.",
       longDescription: "Transform slow websites into lightning-fast experiences that users love and search engines reward. I analyze your current performance and implement targeted optimizations for maximum impact.",
       icon: Zap,
+      image: "/images/services/performance.jpg",
       category: "Optimization",
       price: "£1,500 - £8,000",
       timeline: "1-4 weeks",
@@ -143,6 +148,7 @@ export default function ServicesPage() {
       description: "Native and cross-platform mobile applications that provide seamless user experiences.",
       longDescription: "Extend your digital presence to mobile devices with apps that work flawlessly across iOS and Android. Built with modern frameworks for optimal performance and user experience.",
       icon: Smartphone,
+      image: "/images/services/mobile-apps.jpg",
       category: "Development",
       price: "£12,000 - £40,000",
       timeline: "10-16 weeks",
@@ -290,12 +296,23 @@ export default function ServicesPage() {
 
           <div className="grid lg:grid-cols-2 gap-8">
             {services.map((service, index) => (
-              <Card key={index} className="p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                <div className="flex items-start gap-6">
-                  <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <service.icon className="h-8 w-8 text-primary" />
+              <Card key={index} className="p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                {/* Service Image */}
+                <div className="relative h-48 mb-6 rounded-lg overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+                  <img 
+                    src={service.image || "/placeholder.svg"} 
+                    alt={service.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                  <div className="absolute top-4 left-4">
+                    <div className="w-12 h-12 bg-primary/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                      <service.icon className="h-6 w-6 text-primary" />
+                    </div>
                   </div>
-                  <div className="flex-1">
+                </div>
+                
+                <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
                       <h3 className="text-2xl font-bold text-foreground">{service.title}</h3>
                       <Badge variant="secondary">{service.category}</Badge>
@@ -367,10 +384,14 @@ export default function ServicesPage() {
       </section>
 
       {/* Process Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-purple-900/20 to-pink-900/20"></div>
+        <div className="absolute inset-0 bg-[url('/images/process-pattern.svg')] bg-repeat opacity-5"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               My Development Process
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -398,10 +419,14 @@ export default function ServicesPage() {
       </section>
 
       {/* Why Choose Me */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/20 via-teal-900/20 to-cyan-900/20"></div>
+        <div className="absolute inset-0 bg-[url('/images/tech-pattern.svg')] bg-repeat opacity-5"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
               Why Choose Me
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -424,10 +449,14 @@ export default function ServicesPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-orange-900/20 to-red-900/20"></div>
+        <div className="absolute inset-0 bg-[url('/images/tech-pattern.svg')] bg-repeat opacity-5"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 bg-clip-text text-transparent">
               Client Success Stories
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">

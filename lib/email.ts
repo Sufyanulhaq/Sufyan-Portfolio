@@ -1,11 +1,6 @@
-import nodemailer from "nodemailer"
+import { Resend } from "resend"
 
-interface EmailConfig {
-  host: string
-  port: number
-  user: string
-  pass: string
-}
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 interface ContactFormData {
   name: string
@@ -22,21 +17,10 @@ interface ContactFormData {
 
 export async function sendContactNotification(contactData: ContactFormData) {
   try {
-    // Create transporter
-    const transporter = nodemailer.createTransporter({
-      host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: parseInt(process.env.SMTP_PORT || "587"),
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: process.env.SMTP_USER || "hello@sufyanulhaq.com",
-        pass: process.env.SMTP_PASS || "",
-      },
-    })
-
     // Email to you (notification)
-    const adminEmail = {
-      from: `"Portfolio Contact Form" <${process.env.SMTP_USER || "hello@sufyanulhaq.com"}>`,
-      to: process.env.CONTACT_EMAIL || "hello@sufyanulhaq.com",
+    const adminEmail = await resend.emails.send({
+      from: "Portfolio Contact Form <hello@sufyanulhaq.com>",
+      to: ["hello@sufyanulhaq.com"],
       subject: `New Contact Form Submission: ${contactData.subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -67,12 +51,12 @@ export async function sendContactNotification(contactData: ContactFormData) {
           </div>
         </div>
       `,
-    }
+    })
 
     // Auto-reply to the user
-    const userEmail = {
-      from: `"Sufyan Ul Haq" <${process.env.SMTP_USER || "hello@sufyanulhaq.com"}>`,
-      to: contactData.email,
+    const userEmail = await resend.emails.send({
+      from: "Sufyan Ul Haq <hello@sufyanulhaq.com>",
+      to: [contactData.email],
       subject: "Thank you for your message - Sufyan Ul Haq",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -102,14 +86,9 @@ export async function sendContactNotification(contactData: ContactFormData) {
           </div>
         </div>
       `,
-    }
+    })
 
-    // Send both emails
-    await Promise.all([
-      transporter.sendMail(adminEmail),
-      transporter.sendMail(userEmail)
-    ])
-
+    console.log("Emails sent successfully:", { adminEmail, userEmail })
     return true
   } catch (error) {
     console.error("Error sending email notifications:", error)
@@ -119,19 +98,9 @@ export async function sendContactNotification(contactData: ContactFormData) {
 
 export async function sendNewsletterWelcome(email: string, firstName?: string) {
   try {
-    const transporter = nodemailer.createTransporter({
-      host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: parseInt(process.env.SMTP_PORT || "587"),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER || "hello@sufyanulhaq.com",
-        pass: process.env.SMTP_PASS || "",
-      },
-    })
-
-    const welcomeEmail = {
-      from: `"Sufyan Ul Haq" <${process.env.SMTP_USER || "hello@sufyanulhaq.com"}>`,
-      to: email,
+    const welcomeEmail = await resend.emails.send({
+      from: "Sufyan Ul Haq <hello@sufyanulhaq.com>",
+      to: [email],
       subject: "Welcome to My Newsletter! 🎉",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -158,9 +127,9 @@ export async function sendNewsletterWelcome(email: string, firstName?: string) {
           Full-Stack Developer</p>
         </div>
       `,
-    }
+    })
 
-    await transporter.sendMail(welcomeEmail)
+    console.log("Welcome email sent successfully:", welcomeEmail)
     return true
   } catch (error) {
     console.error("Error sending welcome email:", error)

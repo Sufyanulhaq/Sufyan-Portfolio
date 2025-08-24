@@ -338,9 +338,6 @@ export default function PortfolioPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <Badge variant="secondary">{project.category}</Badge>
-                    <Button asChild variant="outline" size="sm">
-                      <Link href={`#project-${project.id}`}>View Details</Link>
-                    </Button>
                   </div>
                 </div>
               </Card>

@@ -161,13 +161,16 @@ export default function AboutPage() {
             </div>
             
             <div className="relative">
-              <div className="w-80 h-80 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto">
-                <div className="text-center">
-                  <div className="w-32 h-32 bg-primary/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Code className="h-16 w-16 text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-foreground">Sufyan Ul Haq</h3>
-                  <p className="text-muted-foreground">Full-Stack Developer</p>
+              <div className="w-80 h-80 rounded-full overflow-hidden mx-auto shadow-2xl">
+                <img 
+                  src="/images/about/professional-portrait.jpg" 
+                  alt="Sufyan Ul Haq - Full-Stack Developer"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
+                <div className="bg-primary text-primary-foreground px-6 py-2 rounded-full text-sm font-medium shadow-lg">
+                  Available for Projects
                 </div>
               </div>
             </div>
@@ -233,10 +236,14 @@ export default function AboutPage() {
       </section>
 
       {/* Skills Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-indigo-900/20 to-purple-900/20"></div>
+        <div className="absolute inset-0 bg-[url('/images/tech-pattern.svg')] bg-repeat opacity-5"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
               Technical Expertise
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">

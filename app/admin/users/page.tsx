@@ -289,10 +289,7 @@ export default function UsersPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Details
-                        </DropdownMenuItem>
+
                         <DropdownMenuItem>
                           <Edit className="mr-2 h-4 w-4" />
                           Edit User
