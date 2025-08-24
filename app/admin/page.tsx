@@ -1,185 +1,206 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { FileText, FolderOpen, Users, Eye, Heart, MessageSquare, BarChart3 } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { getSession, logoutAction } from '@/lib/auth-actions'
+import { redirect } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { 
+  FileText, 
+  Users, 
+  MessageSquare, 
+  BarChart3, 
+  Settings,
+  LogOut,
+  Plus,
+  Eye
+} from 'lucide-react'
+import Link from 'next/link'
 
-// Force dynamic rendering to prevent build-time MongoDB connection
-export const dynamic = 'force-dynamic'
-
-// Dynamic imports to prevent build-time analysis
-const connectDB = () => import("@/lib/mongodb").then(m => m.default())
-const Post = () => import("@/models/Post").then(m => m.default)
-const User = () => import("@/models/User").then(m => m.default)
-const Project = () => import("@/models/Project").then(m => m.default)
-const Comment = () => import("@/models/Comment").then(m => m.default)
-import StatsCard from "@/components/StatsCard"
-
-async function getDashboardStats() {
-  try {
-    await connectDB()
-
-    const [postsCount, usersCount, projectsCount, commentsCount, totalViews, totalLikes, recentPosts] =
-      await Promise.all([
-        (await Post()).countDocuments(),
-        (await User()).countDocuments(),
-        (await Project()).countDocuments(),
-        (await Comment()).countDocuments(),
-        (await Post()).aggregate([{ $group: { _id: null, total: { $sum: "$views" } } }]),
-        (await Post()).aggregate([{ $group: { _id: null, total: { $sum: "$likes" } } }]),
-        (await Post()).find().populate("author", "name").sort({ createdAt: -1 }).limit(5).lean(),
-      ])
-
-    return {
-      postsCount,
-      usersCount,
-      projectsCount,
-      commentsCount,
-      totalViews: totalViews[0]?.total || 0,
-      totalLikes: totalLikes[0]?.total || 0,
-      recentPosts: recentPosts.map((post) => ({
-        ...post,
-        _id: post._id.toString(),
-        author: {
-          ...post.author,
-          _id: post.author._id.toString(),
-        },
-        createdAt: post.createdAt.toISOString(),
-      })),
-    }
-  } catch (error) {
-    console.error("Error fetching dashboard stats:", error)
-    return {
-      postsCount: 0,
-      usersCount: 0,
-      projectsCount: 0,
-      commentsCount: 0,
-      totalViews: 0,
-      totalLikes: 0,
-      recentPosts: [],
-    }
-  }
-}
-
-export default async function AdminDashboard() {
-  const stats = await getDashboardStats()
-
-  const statCards = [
-    {
-      title: "Total Posts",
-      value: stats.postsCount,
-      description: "Published blog posts",
-      icon: FileText,
-      color: "text-blue-600",
-      trend: { value: 12, type: "positive" as const, label: "vs last month" },
-    },
-    {
-      title: "Total Projects",
-      value: stats.projectsCount,
-      description: "Portfolio projects",
-      icon: FolderOpen,
-      color: "text-green-600",
-      trend: { value: 8, type: "positive" as const, label: "vs last month" },
-    },
-    {
-      title: "Total Users",
-      value: stats.usersCount,
-      description: "Registered users",
-      icon: Users,
-      color: "text-purple-600",
-      trend: { value: 15, type: "positive" as const, label: "vs last month" },
-    },
-    {
-      title: "Total Views",
-      value: stats.totalViews.toLocaleString(),
-      description: "Blog post views",
-      icon: Eye,
-      color: "text-orange-600",
-      trend: { value: 23, type: "positive" as const, label: "vs last month" },
-    },
-    {
-      title: "Total Likes",
-      value: stats.totalLikes,
-      description: "Blog post likes",
-      icon: Heart,
-      color: "text-red-600",
-      trend: { value: 18, type: "positive" as const, label: "vs last month" },
-    },
-    {
-      title: "Comments",
-      value: stats.commentsCount,
-      description: "User comments",
-      icon: MessageSquare,
-      color: "text-cyan-600",
-      trend: { value: 5, type: "negative" as const, label: "vs last month" },
-    },
-  ]
+export default async function AdminPage() {
+  const session = await getSession()
+  if (!session) redirect('/auth/login')
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-heading text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome to your admin dashboard</p>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b bg-card">
+        <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+            <span className="text-sm text-muted-foreground">
+              Welcome, {session.name || session.email}
+            </span>
+          </div>
+          <div className="ml-auto flex items-center space-x-4">
+            <form action={logoutAction}>
+              <Button variant="outline" size="sm">
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </form>
+          </div>
         </div>
-        <Button asChild>
-          <Link href="/admin/analytics">
-            <BarChart3 className="mr-2 h-4 w-4" />
-            View Analytics
-          </Link>
-        </Button>
       </div>
 
-      {/* Enhanced Stats Grid with StatsCard component */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {statCards.map((stat) => (
-          <StatsCard
-            key={stat.title}
-            title={stat.title}
-            value={stat.value}
-            description={stat.description}
-            icon={stat.icon}
-            trend={stat.trend}
-          />
-        ))}
-      </div>
+      {/* Main Content */}
+      <div className="p-6 sm:p-8 lg:p-12">
+        {/* Stats Overview */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Posts</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">24</div>
+              <p className="text-xs text-muted-foreground">
+                +2 from last month
+              </p>
+            </CardContent>
+          </Card>
 
-      {/* Recent Posts */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Posts</CardTitle>
-          <CardDescription>Latest blog posts from your site</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {stats.recentPosts.length > 0 ? (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">1,234</div>
+              <p className="text-xs text-muted-foreground">
+                +180 from last month
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Comments</CardTitle>
+              <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">89</div>
+              <p className="text-xs text-muted-foreground">
+                +12 from last month
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Analytics</CardTitle>
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">+12.5%</div>
+              <p className="text-xs text-muted-foreground">
+                +4.3% from last month
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Content Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button asChild className="w-full" size="sm">
+                <Link href="/admin/posts/new">
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Post
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full" size="sm">
+                <Link href="/admin/posts">
+                  <Eye className="mr-2 h-4 w-4" />
+                  View All Posts
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                User Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button asChild className="w-full" size="sm">
+                <Link href="/admin/users">
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Users
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full" size="sm">
+                <Link href="/admin/users">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add User
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                System Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button asChild className="w-full" size="sm">
+                <Link href="/admin/settings">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Configure
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full" size="sm">
+                <Link href="/admin/analytics">
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  View Analytics
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="space-y-4">
-              {stats.recentPosts.map((post) => (
-                <div key={post._id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{post.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      By {post.author.name} • {new Date(post.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Badge variant={post.published ? "default" : "secondary"}>
-                      {post.published ? "Published" : "Draft"}
-                    </Badge>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Eye className="h-4 w-4" />
-                      <span>{post.views}</span>
-                      <Heart className="h-4 w-4 ml-2" />
-                      <span>{post.likes}</span>
-                    </div>
-                  </div>
+              <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">New blog post published</p>
+                  <p className="text-xs text-muted-foreground">"Building Modern Web Applications" was published 2 hours ago</p>
                 </div>
-              ))}
+              </div>
+              <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">New user registered</p>
+                  <p className="text-xs text-muted-foreground">john@example.com joined 4 hours ago</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Comment awaiting moderation</p>
+                  <p className="text-xs text-muted-foreground">5 new comments need review</p>
+                </div>
+              </div>
             </div>
-          ) : (
-            <p className="text-muted-foreground">No posts found</p>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

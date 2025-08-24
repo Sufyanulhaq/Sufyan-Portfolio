@@ -1,85 +1,45 @@
-import { withAuth } from "next-auth/middleware"
-import { NextResponse } from "next/server"
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token
-    const pathname = req.nextUrl.pathname
+export function middleware(request: NextRequest) {
+  // Protect admin routes
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    const session = request.cookies.get('admin-session')
+    if (!session) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
+    }
+  }
 
-    // Create response
-    const response = NextResponse.next()
-
-    // Add basic security headers
-    response.headers.set("X-Content-Type-Options", "nosniff")
-    response.headers.set("X-Frame-Options", "DENY")
-    response.headers.set("X-XSS-Protection", "1; mode=block")
-    response.headers.set("Referrer-Policy", "origin-when-cross-origin")
-
-    return response
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        const pathname = req.nextUrl.pathname
-
-        if (!token) {
-          return false
-        }
-
-        // Basic role-based access control
-        const userRole = token?.role as string
-
-        // Super Admin routes
-        if (pathname.startsWith("/admin/system")) {
-          return userRole === "SUPER_ADMIN"
-        }
-
-        // User management routes
-        if (pathname.startsWith("/admin/users")) {
-          return ["SUPER_ADMIN", "ADMIN"].includes(userRole)
-        }
-
-        // Content management routes
-        if (pathname.startsWith("/admin/posts")) {
-          return ["SUPER_ADMIN", "ADMIN", "EDITOR"].includes(userRole)
-        }
-
-        // Project management routes
-        if (pathname.startsWith("/admin/projects")) {
-          return ["SUPER_ADMIN", "ADMIN"].includes(userRole)
-        }
-
-        // Analytics routes
-        if (pathname.startsWith("/admin/analytics")) {
-          return ["SUPER_ADMIN", "ADMIN", "EDITOR"].includes(userRole)
-        }
-
-        // Contact management routes
-        if (pathname.startsWith("/admin/contacts")) {
-          return ["SUPER_ADMIN", "ADMIN"].includes(userRole)
-        }
-
-        // General admin access (dashboard, comments)
-        if (pathname.startsWith("/admin")) {
-          return ["SUPER_ADMIN", "ADMIN", "EDITOR", "VIEWER"].includes(userRole)
-        }
-
-        // API routes protection
-        if (pathname.startsWith("/api/admin")) {
-          return ["SUPER_ADMIN", "ADMIN", "EDITOR", "VIEWER"].includes(userRole)
-        }
-
-        // Profile routes - all authenticated users
-        if (pathname.startsWith("/profile")) {
-          return true
-        }
-
-        return true
-      },
-    },
-  },
-)
+  // Add security headers
+  const response = NextResponse.next()
+  
+  // Security headers
+  response.headers.set("X-Frame-Options", "DENY")
+  response.headers.set("X-Content-Type-Options", "nosniff")
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
+  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+  
+  // Content Security Policy
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: https: blob:",
+    "connect-src 'self' https:",
+    "media-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "upgrade-insecure-requests"
+  ].join("; ")
+  
+  response.headers.set("Content-Security-Policy", csp)
+  
+  return response
+}
 
 export const config = {
-  matcher: ["/admin/:path*", "/profile/:path*", "/api/admin/:path*", "/api/auth/:path*"],
+  matcher: ['/admin/:path*']
 }
