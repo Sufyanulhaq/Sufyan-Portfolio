@@ -11,7 +11,8 @@ import {
   ArrowRight,
   Code,
   Palette,
-  Zap
+  Zap,
+  MessageCircle
 } from "lucide-react"
 
 export default function Footer() {
@@ -42,7 +43,7 @@ export default function Footer() {
       icon: Phone,
       label: "Phone",
       value: "+44 746 975 3723",
-      href: "tel:+447469753723"
+      href: "https://wa.me/447469753723"
     },
     {
       icon: MapPin,
@@ -73,14 +74,30 @@ export default function Footer() {
               performance optimization, and user experience design. Based in Liverpool, serving clients across the UK and worldwide.
             </p>
             <div className="flex space-x-4">
-              <Link href="https://github.com" className="text-gray-400 hover:text-white transition-colors">
+              <Link href="https://github.com/Sufyanulhaq" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <Github className="h-6 w-6" />
               </Link>
-              <Link href="https://linkedin.com" className="text-gray-400 hover:text-white transition-colors">
+              <Link href="https://www.linkedin.com/in/sufyanulhaq/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <Linkedin className="h-6 w-6" />
               </Link>
-              <Link href="https://twitter.com" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter className="h-6 w-6" />
+              <Link href="https://www.fiverr.com/sellers/nexgendev_" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <Globe className="h-6 w-6" />
+              </Link>
+              <Link href="https://www.upwork.com/freelancers/~013b81e78082f94d09" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <Code className="h-6 w-6" />
+              </Link>
+            </div>
+            
+            {/* WhatsApp Button */}
+            <div className="mt-4">
+              <Link 
+                href="https://wa.me/447469753723" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                <MessageCircle className="h-5 w-5" />
+                <span>Chat on WhatsApp</span>
               </Link>
             </div>
           </div>

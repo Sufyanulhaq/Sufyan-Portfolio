@@ -495,25 +495,7 @@ export default function PortfolioPage() {
                     </ul>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-3">
-                    {project.liveUrl && (
-                      <Button asChild size="cta" className="flex-1">
-                        <Link href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-                          <Globe className="h-4 w-4 mr-2" />
-                          Live Demo
-                        </Link>
-                      </Button>
-                    )}
-                    {project.githubUrl && (
-                      <Button asChild variant="outline" size="cta">
-                        <Link href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                          <Github className="h-4 w-4 mr-2" />
-                          Code
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
+                  {/* Project details complete - no action buttons needed */}
                 </div>
               </Card>
             ))}

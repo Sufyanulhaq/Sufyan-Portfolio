@@ -41,17 +41,9 @@ export default function LoginPage() {
       if (result?.error) {
         setError(`Login failed: ${result.error}`)
       } else if (result?.ok) {
-        console.log("Sign in successful, getting session...")
-        const session = await getSession()
-        console.log("Session:", session)
-        
-        if (session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "ADMIN") {
-          console.log("Redirecting to admin...")
-          router.push("/admin")
-        } else {
-          console.log("Redirecting to home...")
-          router.push("/")
-        }
+        console.log("Sign in successful, redirecting...")
+        // Force a page reload to ensure session is updated
+        window.location.href = "/admin"
       } else {
         setError("Login failed - no result returned")
       }
