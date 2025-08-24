@@ -1,5 +1,16 @@
 import mongoose from "mongoose"
 
+// Import models to ensure they're registered
+import "@/models/User"
+import "@/models/Post"
+import "@/models/Project"
+import "@/models/Category"
+import "@/models/Tag"
+import "@/models/Comment"
+import "@/models/ContactForm"
+import "@/models/Newsletter"
+import "@/models/UserActivity"
+
 const MONGODB_URI = process.env.MONGODB_URI
 
 // Don't throw error during build time
