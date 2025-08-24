@@ -21,7 +21,7 @@ async function setupDatabase() {
     
     await sql`
       CREATE TABLE IF NOT EXISTS neon_auth.users_sync (
-        id TEXT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
         name TEXT,
         raw_json JSONB,
@@ -36,9 +36,8 @@ async function setupDatabase() {
     const hashedPassword = await bcrypt.hash('admin123', 12);
     
     await sql`
-      INSERT INTO neon_auth.users_sync (id, email, name, raw_json)
+      INSERT INTO neon_auth.users_sync (email, name, raw_json)
       VALUES (
-        'admin-001',
         'admin@example.com',
         'Admin User',
         ${JSON.stringify({ password: hashedPassword })}

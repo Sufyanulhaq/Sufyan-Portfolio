@@ -30,7 +30,7 @@ export async function loginAction(formData: FormData) {
     const isPasswordValid = await bcrypt.compare(password, userData.password)
     if (!isPasswordValid) return { error: 'Invalid credentials' }
 
-    cookies().set('admin-session', user.id, {
+    cookies().set('admin-session', user.id.toString(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
