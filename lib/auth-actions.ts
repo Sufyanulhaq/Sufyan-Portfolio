@@ -15,7 +15,7 @@ export async function loginAction(formData: FormData) {
     const sql = neon(process.env.DATABASE_URL!)
 
     const users = await sql`
-      SELECT id, email, name, role, password
+      SELECT id, email, name, role, password_hash
       FROM cms.users
       WHERE email = ${email}
       AND is_active = TRUE
@@ -26,7 +26,7 @@ export async function loginAction(formData: FormData) {
 
     const user = users[0]
 
-    const isPasswordValid = await bcrypt.compare(password, user.password)
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash)
     if (!isPasswordValid) return { error: 'Invalid credentials' }
 
     // Update last login
