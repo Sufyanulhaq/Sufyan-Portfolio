@@ -21,6 +21,7 @@ import {
   Heart
 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 
@@ -66,7 +67,7 @@ export default function BlogPage() {
       featured: true,
       views: 2847,
       likes: 156,
-      coverImage: "/modern-portfolio-website.png",
+      coverImage: "/images/blog-post-1.jpg",
       slug: "building-high-performance-react-applications"
     },
     {
@@ -85,7 +86,7 @@ export default function BlogPage() {
       featured: true,
       views: 2156,
       likes: 98,
-      coverImage: "/modern-ecommerce-dashboard.png",
+      coverImage: "/images/blog-post-2.jpg",
       slug: "future-of-web-development-ai-integration"
     },
     {
@@ -104,7 +105,7 @@ export default function BlogPage() {
       featured: true,
       views: 1892,
       likes: 87,
-      coverImage: "/task-management-app.png",
+      coverImage: "/images/blog-post-3.jpg",
       slug: "seo-best-practices-2025"
     },
     {
@@ -227,12 +228,21 @@ export default function BlogPage() {
           <div className="grid lg:grid-cols-3 gap-8">
             {featuredPosts.map((post) => (
               <Card key={post.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                <div className="h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <BookOpen className="h-8 w-8 text-primary" />
+                <div className="h-48 relative overflow-hidden">
+                  <Image
+                    src={post.coverImage}
+                    alt={post.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <BookOpen className="h-8 w-8 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-white px-4 drop-shadow-lg">{post.title}</h3>
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground px-4">{post.title}</h3>
                   </div>
                 </div>
                 <div className="p-6">

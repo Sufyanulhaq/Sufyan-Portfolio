@@ -403,25 +403,31 @@ export default async function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 relative overflow-hidden" style={{
+        backgroundImage: 'url(/images/client-testimonial-bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
+        <div className="absolute inset-0 bg-black/60"></div>
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-4xl font-bold text-white mb-4">
               What Clients Say
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
               Don't just take my word for it - hear from the businesses I've helped transform.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="p-6">
+            <Card className="p-6 bg-white/95 backdrop-blur-sm">
               <div className="flex items-center gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-foreground mb-4">
                 "Sufyan delivered an exceptional website that exceeded our expectations. His attention to detail and technical expertise are unmatched."
               </p>
               <div className="flex items-center gap-3">
@@ -435,13 +441,13 @@ export default async function HomePage() {
               </div>
             </Card>
 
-            <Card className="p-6">
+            <Card className="p-6 bg-white/95 backdrop-blur-sm">
               <div className="flex items-center gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-foreground mb-4">
                 "Working with Sufyan was a game-changer for our business. He transformed our vision into a powerful digital presence."
               </p>
               <div className="flex items-center gap-3">
@@ -455,13 +461,13 @@ export default async function HomePage() {
               </div>
             </Card>
 
-            <Card className="p-6">
+            <Card className="p-6 bg-white/95 backdrop-blur-sm">
               <div className="flex items-center gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-foreground mb-4">
                 "Professional, reliable, and incredibly talented. Sufyan delivered our project on time and within budget."
               </p>
               <div className="flex items-center gap-3">
