@@ -9,6 +9,8 @@ export async function loginAction(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
+  console.log('🔐 Login attempt for:', email)
+
   if (!email || !password) return { error: 'Email and password are required' }
 
   try {
@@ -22,11 +24,16 @@ export async function loginAction(formData: FormData) {
       LIMIT 1
     `
 
+    console.log('👤 Users found:', users.length)
+
     if (users.length === 0) return { error: 'Invalid credentials' }
 
     const user = users[0]
+    console.log('🔍 Comparing password for user:', user.email)
 
     const isPasswordValid = await bcrypt.compare(password, user.password_hash)
+    console.log('✅ Password valid:', isPasswordValid)
+    
     if (!isPasswordValid) return { error: 'Invalid credentials' }
 
     // Update last login
