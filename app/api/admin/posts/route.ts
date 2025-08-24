@@ -1,130 +1,168 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import connectDB from "@/lib/mongodb"
-import Post from "@/models/Post"
+import { NextResponse } from 'next/server'
+import { neon } from '@neondatabase/serverless'
+import { getSession } from '@/lib/auth-actions'
 
-export async function GET(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Check authentication
+    const session = await getSession()
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if user has permission to view posts
-    if (!["SUPER_ADMIN", "ADMIN", "EDITOR", "VIEWER"].includes(session.user.role)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    const body = await request.json()
+    const {
+      title,
+      slug,
+      excerpt,
+      content,
+      category,
+      tags,
+      status,
+      featured,
+      readTime,
+      featuredImage,
+      seoTitle,
+      seoDescription,
+      seoKeywords
+    } = body
+
+    // Validation
+    if (!title || !slug || !content) {
+      return NextResponse.json(
+        { error: 'Title, slug, and content are required' },
+        { status: 400 }
+      )
     }
 
-    const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get("page") || "1")
-    const limit = parseInt(searchParams.get("limit") || "10")
-    const status = searchParams.get("status") || "all"
-    const category = searchParams.get("category") || "all"
-    const search = searchParams.get("search") || ""
-    
-    await connectDB()
+    const sql = neon(process.env.DATABASE_URL!)
 
-    // Build query
-    const query: any = {}
-    
-    if (status !== "all") {
-      query.published = status === "published"
-    }
-    
-    if (category !== "all") {
-      query.category = category
-    }
-    
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { excerpt: { $regex: search, $options: "i" } },
-        { content: { $regex: search, $options: "i" } },
-      ]
+    // Check if slug already exists
+    const existingPost = await sql`
+      SELECT id FROM cms.posts WHERE slug = ${slug} LIMIT 1
+    `
+
+    if (existingPost.length > 0) {
+      return NextResponse.json(
+        { error: 'A post with this slug already exists' },
+        { status: 400 }
+      )
     }
 
-    // Execute query with pagination
-    const skip = (page - 1) * limit
-    
-    const [posts, total] = await Promise.all([
-      Post.find(query)
-        .populate("author", "name email")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Post.countDocuments(query),
-    ])
+    // Create SEO settings
+    const seoData = {
+      meta_title: seoTitle || title,
+      meta_description: seoDescription || excerpt,
+      keywords: seoKeywords ? seoKeywords.split(',').map((k: string) => k.trim()) : [],
+      canonical_url: `/blog/${slug}`,
+      og_image: featuredImage,
+      og_title: seoTitle || title,
+      og_description: seoDescription || excerpt
+    }
 
-    const formattedPosts = posts.map((post) => ({
-      ...post,
-      _id: post._id.toString(),
-      author: post.author ? {
-        ...post.author,
-        _id: post.author._id.toString(),
-      } : null,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
-    }))
+    // Insert the post
+    const result = await sql`
+      INSERT INTO cms.posts (
+        title, slug, excerpt, content, category, tags, status, 
+        featured, read_time, featured_image, author_id, published_at
+      ) VALUES (
+        ${title}, ${slug}, ${excerpt || null}, ${content}, 
+        ${category || null}, ${tags || []}, ${status || 'draft'}, 
+        ${featured || false}, ${readTime ? parseInt(readTime) : null}, 
+        ${featuredImage || null}, ${session.id}, 
+        ${status === 'published' ? new Date().toISOString() : null}
+      ) RETURNING id
+    `
+
+    const postId = result[0].id
+
+    // Insert SEO settings
+    await sql`
+      INSERT INTO cms.seo_settings (
+        page_type, page_id, meta_title, meta_description, keywords,
+        canonical_url, og_image, og_title, og_description
+      ) VALUES (
+        'post', ${postId}, ${seoData.meta_title}, ${seoData.meta_description},
+        ${seoData.keywords}, ${seoData.canonical_url}, ${seoData.og_image},
+        ${seoData.og_title}, ${seoData.og_description}
+      )
+    `
+
+    // Log the activity
+    await sql`
+      INSERT INTO cms.activity_logs (
+        user_id, action, table_name, record_id, new_values
+      ) VALUES (
+        ${session.id}, 'create', 'posts', ${postId}, ${JSON.stringify({
+          title, slug, status, author: session.name
+        })}
+      )
+    `
 
     return NextResponse.json({
-      posts: formattedPosts,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      success: true,
+      message: 'Post created successfully',
+      post: {
+        id: postId,
+        title,
+        slug,
+        status
+      }
     })
+
   } catch (error) {
-    console.error("Error fetching posts:", error)
+    console.error('Error creating post:', error)
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Failed to create post' },
       { status: 500 }
     )
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Check authentication
+    const session = await getSession()
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if user has permission to create posts
-    if (!["SUPER_ADMIN", "ADMIN", "EDITOR"].includes(session.user.role)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-    }
+    const sql = neon(process.env.DATABASE_URL!)
 
-    const body = await request.json()
-    
-    await connectDB()
-
-    // Create new post
-    const post = new Post({
-      ...body,
-      author: session.user.id,
-    })
-
-    await post.save()
+    const posts = await sql`
+      SELECT 
+        p.id,
+        p.title,
+        p.slug,
+        p.excerpt,
+        p.status,
+        p.published_at,
+        p.views_count,
+        p.likes_count,
+        p.read_time,
+        p.created_at,
+        p.category,
+        p.tags,
+        p.featured,
+        u.name as author_name
+      FROM cms.posts p
+      LEFT JOIN cms.users u ON p.author_id = u.id
+      ORDER BY p.created_at DESC
+    `
 
     return NextResponse.json({
-      message: "Post created successfully",
-      post: {
-        ...post.toObject(),
-        _id: post._id.toString(),
-        createdAt: post.createdAt.toISOString(),
-        updatedAt: post.updatedAt.toISOString(),
-      },
+      success: true,
+      posts: posts.map(post => ({
+        ...post,
+        created_at: post.created_at?.toISOString(),
+        published_at: post.published_at?.toISOString()
+      }))
     })
+
   } catch (error) {
-    console.error("Error creating post:", error)
+    console.error('Error fetching posts:', error)
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Failed to fetch posts' },
       { status: 500 }
     )
   }

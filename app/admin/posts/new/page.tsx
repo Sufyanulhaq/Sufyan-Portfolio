@@ -1,285 +1,346 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-
-
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Save, Plus, X } from "lucide-react"
-import Link from "next/link"
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { 
+  ArrowLeft, 
+  Save, 
+  Eye, 
+  Plus, 
+  X,
+  Calendar,
+  Clock,
+  Tag,
+  FileText
+} from 'lucide-react'
+import Link from 'next/link'
 
 export default function NewPostPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
-    title: "",
-    excerpt: "",
-    content: "",
-    category: "",
+    title: '',
+    slug: '',
+    excerpt: '',
+    content: '',
+    category: '',
     tags: [] as string[],
-    coverImage: "",
-    readTime: 5,
-    published: false,
-    featured: false
+    status: 'draft',
+    featured: false,
+    readTime: '',
+    featuredImage: '',
+    seoTitle: '',
+    seoDescription: '',
+    seoKeywords: ''
   })
-  const [newTag, setNewTag] = useState("")
+  const [newTag, setNewTag] = useState('')
 
-  const categories = [
-    "Web Development",
-    "Mobile Apps", 
-    "UI/UX Design",
-    "E-commerce",
-    "API Development",
-    "Performance"
-  ]
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9 -]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim()
+  }
+
+  const handleTitleChange = (title: string) => {
+    setFormData(prev => ({ ...prev, title }))
+    if (!formData.slug) {
+      setFormData(prev => ({ ...prev, slug: generateSlug(title) }))
+    }
+  }
+
+  const addTag = () => {
+    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
+      setFormData(prev => ({ ...prev, tags: [...prev.tags, newTag.trim()] }))
+      setNewTag('')
+    }
+  }
+
+  const removeTag = (tagToRemove: string) => {
+    setFormData(prev => ({ ...prev, tags: prev.tags.filter(tag => tag !== tagToRemove) }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/admin/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/admin/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
 
       if (response.ok) {
-        router.push("/admin/posts")
+        router.push('/admin/posts')
       } else {
-        throw new Error("Failed to create post")
+        const error = await response.json()
+        alert(`Error: ${error.message}`)
       }
     } catch (error) {
-      console.error("Error creating post:", error)
-      alert("Failed to create post. Please try again.")
+      alert('An error occurred while creating the post')
     } finally {
       setIsLoading(false)
     }
   }
 
-  const addTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, newTag.trim()]
-      }))
-      setNewTag("")
-    }
-  }
-
-  const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
-    }))
-  }
-
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" asChild>
-            <Link href="/admin/posts">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Posts
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Create New Post</h1>
-            <p className="text-muted-foreground">Add a new blog post to your website</p>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b bg-card">
+        <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center space-x-4">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/posts">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Posts
+              </Link>
+            </Button>
+            <h1 className="text-2xl font-bold">Create New Blog Post</h1>
+          </div>
+          <div className="ml-auto flex items-center space-x-4">
+            <Button variant="outline" size="sm">
+              <Eye className="mr-2 h-4 w-4" />
+              Preview
+            </Button>
+            <Button onClick={handleSubmit} disabled={isLoading}>
+              <Save className="mr-2 h-4 w-4" />
+              {isLoading ? 'Saving...' : 'Save Post'}
+            </Button>
           </div>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-6 lg:grid-cols-3">
-            {/* Main Form */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Basic Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Basic Information</CardTitle>
-                  <CardDescription>Essential details for your blog post</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="title">Title *</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                      placeholder="Enter post title"
-                      required
-                    />
-                  </div>
+      {/* Main Content */}
+      <div className="p-6 sm:p-8 lg:p-12">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Basic Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Basic Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Post Title *</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    placeholder="Enter post title"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="slug">URL Slug *</Label>
+                  <Input
+                    id="slug"
+                    value={formData.slug}
+                    onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
+                    placeholder="post-url-slug"
+                    required
+                  />
+                </div>
+              </div>
 
-                  <div>
-                    <Label htmlFor="excerpt">Excerpt *</Label>
-                    <Textarea
-                      id="excerpt"
-                      value={formData.excerpt}
-                      onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
-                      placeholder="Brief description of the post"
-                      rows={3}
-                      required
-                    />
-                  </div>
+              <div className="space-y-2">
+                <Label htmlFor="excerpt">Excerpt</Label>
+                <Textarea
+                  id="excerpt"
+                  value={formData.excerpt}
+                  onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
+                  placeholder="Brief description of the post"
+                  rows={3}
+                />
+              </div>
 
-                  <div>
-                    <Label htmlFor="content">Content *</Label>
-                    <Textarea
-                      id="content"
-                      value={formData.content}
-                      onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                      placeholder="Write your blog post content here..."
-                      rows={15}
-                      required
-                    />
-                    <p className="text-sm text-muted-foreground mt-1">
-                      You can use markdown formatting for rich content
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="space-y-2">
+                <Label htmlFor="content">Content *</Label>
+                <Textarea
+                  id="content"
+                  value={formData.content}
+                  onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                  placeholder="Write your blog post content here..."
+                  rows={12}
+                  required
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-              {/* Categories & Tags */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Categories & Tags</CardTitle>
-                  <CardDescription>Organize your post for better discoverability</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="category">Category</Label>
-                    <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+          {/* Categories & Tags */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Tag className="h-5 w-5" />
+                Categories & Tags
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Development">Development</SelectItem>
+                      <SelectItem value="Technology">Technology</SelectItem>
+                      <SelectItem value="Design">Design</SelectItem>
+                      <SelectItem value="Business">Business</SelectItem>
+                      <SelectItem value="Tutorial">Tutorial</SelectItem>
+                      <SelectItem value="News">News</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  <div>
-                    <Label>Tags</Label>
-                    <div className="flex gap-2 mb-2">
-                      <Input
-                        value={newTag}
-                        onChange={(e) => setNewTag(e.target.value)}
-                        placeholder="Add a tag"
-                        onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
-                      />
-                      <Button type="button" onClick={addTag} size="sm">
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {formData.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="gap-1">
-                          {tag}
-                          <button
-                            type="button"
-                            onClick={() => removeTag(tag)}
-                            className="ml-1 hover:text-destructive"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="readTime">Read Time (minutes)</Label>
+                  <Input
+                    id="readTime"
+                    type="number"
+                    value={formData.readTime}
+                    onChange={(e) => setFormData(prev => ({ ...prev, readTime: e.target.value }))}
+                    placeholder="5"
+                    min="1"
+                  />
+                </div>
+              </div>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Publish Settings */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Publish Settings</CardTitle>
-                  <CardDescription>Control when and how your post appears</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="published">Published</Label>
-                    <Switch
-                      id="published"
-                      checked={formData.published}
-                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, published: checked }))}
-                    />
+              <div className="space-y-2">
+                <Label>Tags</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    placeholder="Add a tag"
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                  />
+                  <Button type="button" onClick={addTag} variant="outline" size="sm">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                {formData.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData.tags.map((tag, index) => (
+                      <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          className="ml-1 hover:text-red-600"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
                   </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="featured">Featured Post</Label>
-                    <Switch
-                      id="featured"
-                      checked={formData.featured}
-                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, featured: checked }))}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+          {/* Publishing Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Publishing Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="published">Published</SelectItem>
+                      <SelectItem value="archived">Archived</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              {/* Additional Settings */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Additional Settings</CardTitle>
-                  <CardDescription>Optional configurations</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="coverImage">Cover Image URL</Label>
-                    <Input
-                      id="coverImage"
-                      value={formData.coverImage}
-                      onChange={(e) => setFormData(prev => ({ ...prev, coverImage: e.target.value }))}
-                      placeholder="https://example.com/image.jpg"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="featuredImage">Featured Image URL</Label>
+                  <Input
+                    id="featuredImage"
+                    value={formData.featuredImage}
+                    onChange={(e) => setFormData(prev => ({ ...prev, featuredImage: e.target.value }))}
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+              </div>
 
-                  <div>
-                    <Label htmlFor="readTime">Estimated Read Time (minutes)</Label>
-                    <Input
-                      id="readTime"
-                      type="number"
-                      value={formData.readTime}
-                      onChange={(e) => setFormData(prev => ({ ...prev, readTime: parseInt(e.target.value) || 5 }))}
-                      min="1"
-                      max="60"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="featured"
+                  checked={formData.featured}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, featured: checked }))}
+                />
+                <Label htmlFor="featured">Mark as featured post</Label>
+              </div>
+            </CardContent>
+          </Card>
 
-              {/* Actions */}
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="space-y-3">
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading ? "Creating..." : "Create Post"}
-                      <Save className="h-4 w-4 ml-2" />
-                    </Button>
-                    <Button variant="outline" className="w-full" asChild>
-                      <Link href="/admin/posts">Cancel</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+          {/* SEO Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                SEO Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="seoTitle">SEO Title</Label>
+                <Input
+                  id="seoTitle"
+                  value={formData.seoTitle}
+                  onChange={(e) => setFormData(prev => ({ ...prev, seoTitle: e.target.value }))}
+                  placeholder="SEO optimized title (leave empty to use post title)"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="seoDescription">SEO Description</Label>
+                <Textarea
+                  id="seoDescription"
+                  value={formData.seoDescription}
+                  onChange={(e) => setFormData(prev => ({ ...prev, seoDescription: e.target.value }))}
+                  placeholder="Meta description for search engines"
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="seoKeywords">SEO Keywords</Label>
+                <Input
+                  id="seoKeywords"
+                  value={formData.seoKeywords}
+                  onChange={(e) => setFormData(prev => ({ ...prev, seoKeywords: e.target.value }))}
+                  placeholder="keyword1, keyword2, keyword3"
+                />
+              </div>
+            </CardContent>
+          </Card>
         </form>
       </div>
     </div>

@@ -1,357 +1,275 @@
-"use client"
+import { getSession } from '@/lib/auth-actions'
+import { redirect } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { 
+  FileText, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Eye,
+  Calendar,
+  Clock,
+  User,
+  TrendingUp
+} from 'lucide-react'
+import Link from 'next/link'
+import { neon } from '@neondatabase/serverless'
 
-import { useState, useEffect } from "react"
-
-
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Filter, Plus, Edit, Eye, Trash2, MoreHorizontal, Calendar, Clock, Eye as EyeIcon, Heart } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
-interface Post {
-  _id: string
-  title: string
-  excerpt: string
-  slug: string
-  category?: string
-  tags?: string[]
-  published: boolean
-  featured: boolean
-  views?: number
-  likes?: number
-  readTime?: number
-  author?: {
-    name: string
-    _id: string
+async function getPosts() {
+  try {
+    const sql = neon(process.env.DATABASE_URL!)
+    
+    const posts = await sql`
+      SELECT 
+        p.id,
+        p.title,
+        p.slug,
+        p.excerpt,
+        p.status,
+        p.published_at,
+        p.views_count,
+        p.likes_count,
+        p.read_time,
+        p.created_at,
+        p.category,
+        p.tags,
+        u.name as author_name
+      FROM cms.posts p
+      LEFT JOIN cms.users u ON p.author_id = u.id
+      ORDER BY p.created_at DESC
+    `
+    
+    return posts
+  } catch (error) {
+    console.error('Error fetching posts:', error)
+    return []
   }
-  createdAt: string
-  updatedAt: string
 }
 
-export default function PostsPage() {
-  const [posts, setPosts] = useState<Post[]>([])
-  const [filteredPosts, setFilteredPosts] = useState<Post[]>([])
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [categoryFilter, setCategoryFilter] = useState("all")
-  const [isLoading, setIsLoading] = useState(true)
+export default async function PostsPage() {
+  const session = await getSession()
+  if (!session) redirect('/auth/login')
+  
+  const posts = await getPosts()
 
-  useEffect(() => {
-    fetchPosts()
-  }, [])
-
-  useEffect(() => {
-    filterPosts()
-  }, [posts, searchQuery, statusFilter, categoryFilter])
-
-  const fetchPosts = async () => {
-    try {
-      const response = await fetch("/api/admin/posts")
-      const data = await response.json()
-      setPosts(data.posts || [])
-    } catch (error) {
-      console.error("Error fetching posts:", error)
-    } finally {
-      setIsLoading(false)
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'published': return 'bg-green-100 text-green-800'
+      case 'draft': return 'bg-yellow-100 text-yellow-800'
+      case 'archived': return 'bg-gray-100 text-gray-800'
+      default: return 'bg-gray-100 text-gray-800'
     }
   }
 
-  const filterPosts = () => {
-    let filtered = posts
-
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (post) =>
-          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          post.category?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    }
-
-    // Status filter
-    if (statusFilter !== "all") {
-      filtered = filtered.filter((post) => {
-        if (statusFilter === "published") return post.published
-        if (statusFilter === "draft") return !post.published
-        if (statusFilter === "featured") return post.featured
-        return true
-      })
-    }
-
-    // Category filter
-    if (categoryFilter !== "all") {
-      filtered = filtered.filter((post) => post.category === categoryFilter)
-    }
-
-    setFilteredPosts(filtered)
-  }
-
-  const togglePostStatus = async (postId: string, field: "published" | "featured") => {
-    try {
-      const post = posts.find((p) => p._id === postId)
-      if (!post) return
-
-      const response = await fetch(`/api/admin/posts/${postId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [field]: !post[field] }),
-      })
-
-      if (response.ok) {
-        setPosts(posts.map((p) => 
-          p._id === postId ? { ...p, [field]: !p[field] } : p
-        ))
-      }
-    } catch (error) {
-      console.error(`Error updating post ${field}:`, error)
-    }
-  }
-
-  const deletePost = async (postId: string) => {
-    if (!confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
-      return
-    }
-
-    try {
-      const response = await fetch(`/api/admin/posts/${postId}`, {
-        method: "DELETE",
-      })
-
-      if (response.ok) {
-        setPosts(posts.filter((p) => p._id !== postId))
-      }
-    } catch (error) {
-      console.error("Error deleting post:", error)
-    }
-  }
-
-  const getCategories = () => {
-    const categories = posts.map((post) => post.category).filter(Boolean) as string[]
-    return [...new Set(categories)]
-  }
-
-  if (isLoading) {
-    return (
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-heading text-3xl font-bold">Blog Posts</h1>
-            <p className="text-muted-foreground">Manage your blog posts and content</p>
-          </div>
-        </div>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-        </div>
-      </div>
-    )
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-heading text-3xl font-bold">Blog Posts</h1>
-          <p className="text-muted-foreground">Manage your blog posts and content</p>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b bg-card">
+        <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-2xl font-bold">Blog Posts Management</h1>
+            <span className="text-sm text-muted-foreground">
+              Manage your blog content and SEO
+            </span>
+          </div>
+          <div className="ml-auto flex items-center space-x-4">
+            <Button asChild>
+              <Link href="/admin/posts/new">
+                <Plus className="mr-2 h-4 w-4" />
+                New Post
+              </Link>
+            </Button>
+          </div>
         </div>
-        <Button asChild>
-          <Link href="/admin/posts/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Post
-          </Link>
-        </Button>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filters & Search</CardTitle>
-          <CardDescription>Find and filter posts by various criteria</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search posts..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="published">Published</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="featured">Featured</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {getCategories().map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="text-sm text-muted-foreground flex items-center">
-              <Filter className="mr-2 h-4 w-4" />
-              {filteredPosts.length} of {posts.length} posts
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Main Content */}
+      <div className="p-6 sm:p-8 lg:p-12">
+        {/* Stats Overview */}
+        <div className="grid gap-4 md:grid-cols-4 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Posts</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{posts.length}</div>
+              <p className="text-xs text-muted-foreground">
+                All time posts
+              </p>
+            </CardContent>
+          </Card>
 
-      {/* Posts Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Posts</CardTitle>
-          <CardDescription>A list of all blog posts and their details</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Post</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Stats</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPosts.map((post) => (
-                <TableRow key={post._id}>
-                  <TableCell>
-                    <div className="space-y-2">
-                      <div className="font-medium line-clamp-2">{post.title}</div>
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        {post.excerpt}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Published</CardTitle>
+              <Eye className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {posts.filter(p => p.status === 'published').length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Live posts
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Drafts</CardTitle>
+              <Edit className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {posts.filter(p => p.status === 'draft').length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                In progress
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Views</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {posts.reduce((sum, p) => sum + (p.views_count || 0), 0).toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                All posts combined
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Posts Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>All Blog Posts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {posts.length === 0 ? (
+              <div className="text-center py-12">
+                <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-medium">No posts yet</h3>
+                <p className="mt-2 text-muted-foreground">
+                  Get started by creating your first blog post.
+                </p>
+                <Button asChild className="mt-4">
+                  <Link href="/admin/posts/new">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create First Post
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {posts.map((post) => (
+                  <div key={post.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-semibold text-lg">{post.title}</h3>
+                        <Badge className={getStatusColor(post.status)}>
+                          {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
+                        </Badge>
+                        {post.featured && (
+                          <Badge variant="secondary">Featured</Badge>
+                        )}
                       </div>
-                      {post.tags && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {post.tags.slice(0, 3).map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                          {post.tags.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{post.tags.length - 3}
-                            </Badge>
-                          )}
-                        </div>
+                      
+                      {post.excerpt && (
+                        <p className="text-muted-foreground text-sm line-clamp-2">
+                          {post.excerpt}
+                        </p>
                       )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {post.category && (
-                      <Badge variant="secondary">{post.category}</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-2">
-                      <Badge variant={post.published ? "default" : "secondary"}>
-                        {post.published ? "Published" : "Draft"}
-                      </Badge>
-                      {post.featured && (
-                        <Badge variant="outline">Featured</Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex items-center gap-1">
-                        <EyeIcon className="h-3 w-3" />
-                        <span>{post.views?.toLocaleString() || 0}</span>
-                      </div>
-                      {post.likes && (
+                      
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <div className="flex items-center gap-1">
-                          <Heart className="h-3 w-3" />
-                          <span>{post.likes}</span>
+                          <User className="h-3 w-3" />
+                          <span>{post.author_name || 'Unknown'}</span>
                         </div>
-                      )}
-                      {post.readTime && (
                         <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>{post.readTime}m</span>
+                          <Calendar className="h-3 w-3" />
+                          <span>{formatDate(post.created_at)}</span>
+                        </div>
+                        {post.published_at && (
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            <span>Published: {formatDate(post.published_at)}</span>
+                          </div>
+                        )}
+                        {post.read_time && (
+                          <span>{post.read_time} min read</span>
+                        )}
+                        {post.views_count > 0 && (
+                          <span>{post.views_count.toLocaleString()} views</span>
+                        )}
+                      </div>
+                      
+                      {post.category && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">Category:</span>
+                          <Badge variant="outline" className="text-xs">
+                            {post.category}
+                          </Badge>
                         </div>
                       )}
+                      
+                                             {post.tags && post.tags.length > 0 && (
+                         <div className="flex items-center gap-2">
+                           <span className="text-xs text-muted-foreground">Tags:</span>
+                           <div className="flex gap-1">
+                             {post.tags.slice(0, 3).map((tag: string, index: number) => (
+                               <Badge key={index} variant="outline" className="text-xs">
+                                 {tag}
+                               </Badge>
+                             ))}
+                             {post.tags.length > 3 && (
+                               <span className="text-xs text-muted-foreground">
+                                 +{post.tags.length - 3} more
+                               </span>
+                             )}
+                           </div>
+                         </div>
+                       )}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {new Date(post.createdAt).toLocaleDateString()}
-                      </div>
+                    
+                    <div className="flex items-center gap-2 ml-4">
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/posts/${post.id}/edit`}>
+                          <Edit className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/blog/${post.slug}`} target="_blank">
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/blog/${post.slug}`}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View Post
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link href={`/admin/posts/${post._id}/edit`}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit Post
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => togglePostStatus(post._id, "published")}>
-                          {post.published ? "Unpublish" : "Publish"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => togglePostStatus(post._id, "featured")}>
-                          {post.featured ? "Remove Featured" : "Mark Featured"}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          onClick={() => deletePost(post._id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete Post
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
