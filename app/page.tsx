@@ -151,7 +151,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-teal-900/20"></div>
         <div className="absolute inset-0 bg-[url('/images/ai-generated/backgrounds/tech-expertise-pattern.svg')] bg-repeat opacity-10"></div>
         {/* Professional Development Workspace Background */}
-        <div className="absolute inset-0 bg-[url('/images/development-process-bg.jpg')] bg-cover bg-center opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('/images/backgrounds/development-process-bg.jpg')] bg-cover bg-center opacity-10"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
@@ -245,7 +245,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-br from-teal-900/20 via-blue-900/20 to-indigo-900/20"></div>
         <div className="absolute inset-0 bg-[url('/images/ai-generated/backgrounds/process-pattern.svg')] bg-repeat opacity-10"></div>
         {/* Professional Development Workspace Background */}
-        <div className="absolute inset-0 bg-[url('/images/development-process-bg.jpg')] bg-cover bg-center opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('/images/backgrounds/development-process-bg.jpg')] bg-cover bg-center opacity-10"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
@@ -318,7 +318,7 @@ export default async function HomePage() {
             <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
               <div className="h-48 overflow-hidden">
                 <img 
-                  src="/images/analytics-dashboard-project.jpg" 
+                  src="/images/portfolio/analytics-dashboard-project.jpg" 
                   alt="Analytics Dashboard Project"
                   className="w-full h-full object-cover"
                 />
@@ -343,7 +343,7 @@ export default async function HomePage() {
             <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
               <div className="h-48 overflow-hidden">
                 <img 
-                  src="/images/ecommerce-project.jpg" 
+                  src="/images/portfolio/ecommerce-project.jpg" 
                   alt="E-commerce Platform Project"
                   className="w-full h-full object-cover"
                 />
@@ -368,7 +368,7 @@ export default async function HomePage() {
             <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
               <div className="h-48 overflow-hidden">
                 <img 
-                  src="/images/lead-generation-project.jpg" 
+                  src="/images/portfolio/lead-generation-project.jpg" 
                   alt="Lead Generation Project"
                   className="w-full h-full object-cover"
                 />
@@ -403,7 +403,7 @@ export default async function HomePage() {
 
       {/* Testimonials Section */}
       <section className="py-20 relative overflow-hidden" style={{
-        backgroundImage: 'url(/images/client-testimonial-bg.jpg)',
+        backgroundImage: 'url(/images/backgrounds/client-testimonial-bg.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'

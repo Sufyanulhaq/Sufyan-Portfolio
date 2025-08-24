@@ -163,7 +163,7 @@ export default function AboutPage() {
             <div className="relative">
               <div className="w-80 h-80 rounded-full overflow-hidden mx-auto shadow-2xl">
                 <img 
-                  src="/images/professional-portrait.jpg" 
+                  src="/images/backgrounds/professional-portrait.jpg" 
                   alt="Sufyan Ul Haq - Full-Stack Developer"
                   className="w-full h-full object-cover"
                 />
@@ -241,7 +241,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-indigo-900/20 to-purple-900/20"></div>
         <div className="absolute inset-0 bg-[url('/images/tech-pattern.svg')] bg-repeat opacity-5"></div>
         {/* Professional Development Workspace Background */}
-        <div className="absolute inset-0 bg-[url('/images/technical-expertise-bg.jpg')] bg-cover bg-center opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('/images/backgrounds/technical-expertise-bg.jpg')] bg-cover bg-center opacity-10"></div>
 
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

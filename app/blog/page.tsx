@@ -67,7 +67,7 @@ export default function BlogPage() {
       featured: true,
       views: 2847,
       likes: 156,
-      coverImage: "/images/blog-post-1.jpg",
+      coverImage: "/images/blogs/blog-post-1.jpg",
       slug: "building-high-performance-react-applications"
     },
     {
@@ -86,7 +86,7 @@ export default function BlogPage() {
       featured: true,
       views: 2156,
       likes: 98,
-      coverImage: "/images/blog-post-2.jpg",
+      coverImage: "/images/blogs/blog-post-2.jpg",
       slug: "future-of-web-development-ai-integration"
     },
     {
@@ -105,7 +105,7 @@ export default function BlogPage() {
       featured: true,
       views: 1892,
       likes: 87,
-      coverImage: "/images/blog-post-3.jpg",
+      coverImage: "/images/blogs/blog-post-3.jpg",
       slug: "seo-best-practices-2025"
     },
     {

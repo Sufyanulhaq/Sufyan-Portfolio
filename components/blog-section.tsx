@@ -62,12 +62,12 @@ export default async function BlogSection() {
                 <Image
                   src={
                     post.coverImage || 
-                    (post.category === "Development" && "/images/blog-post-1.jpg") ||
-                    (post.category === "Technology" && "/images/blog-post-2.jpg") ||
-                    (post.category === "SEO" && "/images/blog-post-3.jpg") ||
-                    (post.category === "Backend" && "/images/blog-post-1.jpg") ||
-                    (post.category === "Performance" && "/images/blog-post-2.jpg") ||
-                    "/images/blog-post-3.jpg"
+                    (post.category === "Development" && "/images/blogs/blog-post-1.jpg") ||
+                    (post.category === "Technology" && "/images/blogs/blog-post-2.jpg") ||
+                    (post.category === "SEO" && "/images/blogs/blog-post-3.jpg") ||
+                    (post.category === "Backend" && "/images/blogs/blog-post-1.jpg") ||
+                    (post.category === "Performance" && "/images/blogs/blog-post-2.jpg") ||
+                    "/images/blogs/blog-post-3.jpg"
                   }
                   alt={post.title}
                   fill
