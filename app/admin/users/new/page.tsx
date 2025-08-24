@@ -23,7 +23,7 @@ import {
   Phone,
   Globe,
   MapPin,
-  Link,
+  Link as LinkIcon,
   Settings
 } from 'lucide-react'
 import Link from 'next/link'
@@ -391,10 +391,10 @@ export default function NewUserPage() {
             {/* Social Links */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Link className="h-5 w-5" />
-                  Social Links
-                </CardTitle>
+                                        <CardTitle className="flex items-center gap-2">
+                          <LinkIcon className="h-5 w-5" />
+                          Social Links
+                        </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
