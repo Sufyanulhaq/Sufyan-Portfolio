@@ -8,11 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Plus, Edit, Trash2, ExternalLink, Github } from "lucide-react"
 import connectDB from "@/lib/mongodb"
-import { Project } from "@/lib/models"
 
 async function getAllProjects() {
   try {
     await connectDB()
+    
+    // Dynamic import to avoid circular dependency issues
+    const { Project } = await import("@/lib/models")
+    
     const projects = await Project.find().sort({ createdAt: -1 }).lean()
 
     return projects.map((project) => ({

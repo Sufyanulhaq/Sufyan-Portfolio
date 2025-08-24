@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowRight, Code, Palette, Zap, Star, TrendingUp, Users, Globe, Award, CheckCircle } from "lucide-react"
+import { ArrowRight, Code, Palette, Zap, Star, TrendingUp, Users, Globe, Award, CheckCircle, Server, TestTube } from "lucide-react"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
@@ -77,11 +77,75 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Technical Expertise Section */}
+      <section className="py-20 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-purple-900/20 to-pink-900/20"></div>
+        <div className="absolute inset-0 bg-[url('/images/ai-generated/backgrounds/tech-expertise-pattern.svg')] bg-repeat opacity-15"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Technical Expertise
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Mastery of modern web technologies and development practices that drive exceptional results.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Frontend */}
+            <Card className="p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+              <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Code className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold mb-3">Frontend Development</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                React, Next.js, TypeScript, Tailwind CSS
+              </p>
+            </Card>
+
+            {/* Backend */}
+            <Card className="p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+              <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Server className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold mb-3">Backend Development</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Node.js, Express, MongoDB, PostgreSQL
+              </p>
+            </Card>
+
+            {/* DevOps */}
+            <Card className="p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+              <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Zap className="h-8 w-8 text-purple-600" />
+              </div>
+              <h3 className="text-lg font-semibold mb-3">DevOps & Deployment</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Docker, AWS, Vercel, CI/CD
+              </p>
+            </Card>
+
+            {/* Testing */}
+            <Card className="p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20">
+              <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <TestTube className="h-8 w-8 text-orange-600" />
+              </div>
+              <h3 className="text-lg font-semibold mb-3">Testing & Quality</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Jest, Cypress, E2E Testing
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Services Preview Section */}
       <section className="py-20 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-teal-900/20"></div>
-        <div className="absolute inset-0 bg-[url('/images/tech-pattern.svg')] bg-repeat opacity-5"></div>
+        <div className="absolute inset-0 bg-[url('/images/ai-generated/backgrounds/tech-expertise-pattern.svg')] bg-repeat opacity-10"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
@@ -173,7 +237,7 @@ export default async function HomePage() {
       <section className="py-20 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-teal-900/20 via-blue-900/20 to-indigo-900/20"></div>
-        <div className="absolute inset-0 bg-[url('/images/process-pattern.svg')] bg-repeat opacity-5"></div>
+        <div className="absolute inset-0 bg-[url('/images/ai-generated/backgrounds/process-pattern.svg')] bg-repeat opacity-10"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">

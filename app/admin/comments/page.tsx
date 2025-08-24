@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Check, X, Trash2, MessageSquare } from "lucide-react"
 import connectDB from "@/lib/mongodb"
-import { Comment } from "@/lib/models"
 
 async function getAllComments() {
   try {
     await connectDB()
+    
+    // Dynamic import to avoid circular dependency issues
+    const { Comment } = await import("@/lib/models")
+    
     const comments = await Comment.find()
       .populate("author", "name")
       .populate("post", "title slug")

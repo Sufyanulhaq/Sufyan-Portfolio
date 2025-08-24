@@ -5,11 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { CalendarDays, Clock, ArrowRight } from "lucide-react"
 import connectDB from "@/lib/mongodb"
-import { Post } from "@/lib/models"
 
 async function getLatestPosts() {
   try {
     await connectDB()
+    
+    // Dynamic import to avoid circular dependency issues
+    const { Post } = await import("@/lib/models")
+    
     const posts = await Post.find({ published: true })
       .populate("author", "name")
       .sort({ createdAt: -1 })

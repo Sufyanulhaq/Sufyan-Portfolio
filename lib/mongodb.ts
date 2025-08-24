@@ -1,11 +1,12 @@
 import mongoose from "mongoose"
 
 // Import models to ensure they're registered
+// Import in dependency order to avoid circular references
 import "@/models/User"
-import "@/models/Post"
-import "@/models/Project"
 import "@/models/Category"
 import "@/models/Tag"
+import "@/models/Post"
+import "@/models/Project"
 import "@/models/Comment"
 import "@/models/ContactForm"
 import "@/models/Newsletter"
