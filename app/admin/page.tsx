@@ -274,6 +274,12 @@ export default async function AdminPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full" size="sm">
+                <Link href="/admin/media">
+                  <Image className="mr-2 h-4 w-4" />
+                  Media Library
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full" size="sm">
                 <Link href="/admin/users">
                   <Users className="mr-2 h-4 w-4" />
                   User Management
