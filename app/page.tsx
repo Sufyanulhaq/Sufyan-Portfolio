@@ -20,6 +20,8 @@ export default async function HomePage() {
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
+        {/* Professional Development Workspace Background */}
+        <div className="absolute inset-0 bg-[url('/images/hero-background.jpg')] bg-cover bg-center opacity-20"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center space-y-8">
@@ -82,6 +84,8 @@ export default async function HomePage() {
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-purple-900/20 to-pink-900/20"></div>
         <div className="absolute inset-0 bg-[url('/images/ai-generated/backgrounds/tech-expertise-pattern.svg')] bg-repeat opacity-15"></div>
+        {/* Professional Development Workspace Background */}
+        <div className="absolute inset-0 bg-[url('/images/technical-expertise-bg.jpg')] bg-cover bg-center opacity-10"></div>
 
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -147,6 +151,8 @@ export default async function HomePage() {
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-teal-900/20"></div>
         <div className="absolute inset-0 bg-[url('/images/ai-generated/backgrounds/tech-expertise-pattern.svg')] bg-repeat opacity-10"></div>
+        {/* Professional Development Workspace Background */}
+        <div className="absolute inset-0 bg-[url('/images/development-process-bg.jpg')] bg-cover bg-center opacity-10"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
@@ -239,6 +245,8 @@ export default async function HomePage() {
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-teal-900/20 via-blue-900/20 to-indigo-900/20"></div>
         <div className="absolute inset-0 bg-[url('/images/ai-generated/backgrounds/process-pattern.svg')] bg-repeat opacity-10"></div>
+        {/* Professional Development Workspace Background */}
+        <div className="absolute inset-0 bg-[url('/images/development-process-bg.jpg')] bg-cover bg-center opacity-10"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
@@ -309,8 +317,12 @@ export default async function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {/* Project 1 */}
             <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-              <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <span className="text-white text-2xl font-bold">SaaS Dashboard</span>
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="/images/analytics-dashboard-project.jpg" 
+                  alt="Analytics Dashboard Project"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">Modern Analytics Platform</h3>
@@ -330,8 +342,12 @@ export default async function HomePage() {
 
             {/* Project 2 */}
             <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-              <div className="h-48 bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center">
-                <span className="text-white text-2xl font-bold">E-commerce</span>
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="/images/ecommerce-project.jpg" 
+                  alt="E-commerce Platform Project"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">Premium Online Store</h3>
@@ -351,8 +367,12 @@ export default async function HomePage() {
 
             {/* Project 3 */}
             <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-              <div className="h-48 bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
-                <span className="text-white text-2xl font-bold">Marketing</span>
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src="/images/lead-generation-project.jpg" 
+                  alt="Lead Generation Project"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">Lead Generation Website</h3>
