@@ -34,13 +34,10 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    company: "",
     subject: "New Project Inquiry",
     message: "",
     phone: "",
     website: "",
-    budget: "",
-    timeline: "",
     source: "Website"
   })
 
@@ -74,13 +71,10 @@ export default function ContactPage() {
         setFormData({
           name: "",
           email: "",
-          company: "",
           subject: "New Project Inquiry",
           message: "",
           phone: "",
           website: "",
-          budget: "",
-          timeline: "",
           source: "Website"
         })
       } else {
@@ -453,69 +447,17 @@ export default function ContactPage() {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="company" className="block text-sm font-medium text-foreground mb-2">
-                        Company
-                      </label>
-                      <Input
-                        id="company"
-                        name="company"
-                        value={formData.company}
-                        onChange={handleInputChange}
-                        placeholder="Your company name"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
-                        Phone Number
-                      </label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        placeholder="+44 746 975 3723"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="budget" className="block text-sm font-medium text-foreground mb-2">
-                        Budget Range
-                      </label>
-                      <Select name="budget" value={formData.budget} onValueChange={(value) => handleInputChange({ target: { name: 'budget', value } })}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your budget range" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="$1K-$5K">$1K - $5K</SelectItem>
-                          <SelectItem value="$5K-$10K">$5K - $10K</SelectItem>
-                          <SelectItem value="$10K-$25K">$10K - $25K</SelectItem>
-                          <SelectItem value="$25K-$50K">$25K - $50K</SelectItem>
-                          <SelectItem value="$50K+">$50K+</SelectItem>
-                          <SelectItem value="Not Sure">Not Sure</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <label htmlFor="timeline" className="block text-sm font-medium text-foreground mb-2">
-                        Timeline
-                      </label>
-                      <Select name="timeline" value={formData.timeline} onValueChange={(value) => handleInputChange({ target: { name: 'timeline', value } })}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your timeline" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ASAP">ASAP</SelectItem>
-                          <SelectItem value="1-2 weeks">1-2 weeks</SelectItem>
-                          <SelectItem value="1-2 months">1-2 months</SelectItem>
-                          <SelectItem value="3+ months">3+ months</SelectItem>
-                          <SelectItem value="Not Sure">Not Sure</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
+                      Phone Number
+                    </label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder="+44 746 975 3723"
+                    />
                   </div>
 
                   <div>

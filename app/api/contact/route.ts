@@ -6,7 +6,7 @@ import { sendContactNotification } from "@/lib/email"
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, email, subject, message, phone, company, website, budget, timeline, source } = body
+    const { name, email, subject, message, phone, website, source } = body
 
     // Basic validation
     if (!name || !email || !subject || !message) {
@@ -40,10 +40,7 @@ export async function POST(request: NextRequest) {
       subject: subject.trim(),
       message: message.trim(),
       phone: phone?.trim(),
-      company: company?.trim(),
       website: website?.trim(),
-      budget,
-      timeline,
       source: source || "Website",
       ipAddress,
       userAgent,
