@@ -314,68 +314,67 @@ export default function ServicesPage() {
                 
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-2xl font-bold text-foreground">{service.title}</h3>
-                      <Badge variant="secondary">{service.category}</Badge>
-                    </div>
-                    <p className="text-muted-foreground mb-4 leading-relaxed">{service.longDescription}</p>
-                    
-                    {/* Tech Stack */}
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-foreground mb-2">Technologies Used:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {service.techStack.map((tech, idx) => (
-                          <Badge key={idx} variant="outline" className="text-xs">
-                            {tech}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Pricing & Timeline */}
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                      <div className="text-sm">
-                        <span className="text-muted-foreground">Investment:</span>
-                        <div className="font-semibold text-foreground">{service.price}</div>
-                      </div>
-                      <div className="text-sm">
-                        <span className="text-muted-foreground">Timeline:</span>
-                        <div className="font-semibold text-foreground">{service.timeline}</div>
-                      </div>
-                    </div>
-
-                    {/* Features */}
-                    <div className="mb-6">
-                      <h4 className="font-semibold text-foreground mb-2">What's Included:</h4>
-                      <ul className="space-y-1">
-                        {service.features.map((feature, idx) => (
-                          <li key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
-                            <CheckCircle className="h-3 w-3 text-green-500" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Benefits */}
-                    <div className="mb-6">
-                      <h4 className="font-semibold text-foreground mb-2">Business Benefits:</h4>
-                      <ul className="space-y-1">
-                        {service.benefits.map((benefit, idx) => (
-                          <li key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
-                            <TrendingUp className="h-3 w-3 text-blue-500" />
-                            {benefit}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <Button asChild size="cta" className="w-full">
-                      <Link href="/contact">
-                        Get Started
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
+                    <h3 className="text-2xl font-bold text-foreground">{service.title}</h3>
+                    <Badge variant="secondary">{service.category}</Badge>
                   </div>
+                  <p className="text-muted-foreground mb-4 leading-relaxed">{service.longDescription}</p>
+                  
+                  {/* Tech Stack */}
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-foreground mb-2">Technologies Used:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {service.techStack.map((tech, idx) => (
+                        <Badge key={idx} variant="outline" className="text-xs">
+                          {tech}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pricing & Timeline */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Investment:</span>
+                      <div className="font-semibold text-foreground">{service.price}</div>
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Timeline:</span>
+                      <div className="font-semibold text-foreground">{service.timeline}</div>
+                    </div>
+                  </div>
+
+                  {/* Features */}
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-foreground mb-2">What's Included:</h4>
+                    <ul className="space-y-1">
+                      {service.features.map((feature, idx) => (
+                        <li key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
+                          <CheckCircle className="h-3 w-3 text-green-500" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Benefits */}
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-foreground mb-2">Business Benefits:</h4>
+                    <ul className="space-y-1">
+                      {service.benefits.map((benefit, idx) => (
+                        <li key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
+                          <TrendingUp className="h-3 w-3 text-blue-500" />
+                          {benefit}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <Button asChild size="cta" className="w-full">
+                    <Link href="/contact">
+                      Get Started
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
                 </div>
               </Card>
             ))}
