@@ -124,7 +124,7 @@ export default function BlogPage() {
       featured: false,
       views: 1456,
       likes: 73,
-      coverImage: "/weather-dashboard.png",
+      coverImage: "/images/portfolio/weather-dashboard.tiff",
       slug: "mastering-typescript-advanced-patterns"
     },
     {
@@ -143,7 +143,7 @@ export default function BlogPage() {
       featured: false,
       views: 1234,
       likes: 65,
-      coverImage: "/real-estate-platform.png",
+      coverImage: "/images/portfolio/real-estate-platform.tiff",
       slug: "building-scalable-microservices-architecture"
     },
     {

@@ -164,7 +164,7 @@ export default function PortfolioPage() {
       category: "Productivity",
       status: "completed",
       featured: false,
-      image: "/task-management-app.png",
+      image: "/images/portfolio/task-management-app.tiff",
       techStack: ["React", "Node.js", "Socket.io", "MongoDB", "AWS S3", "JWT", "Multer"],
       challenges: [
         "Real-time collaboration across multiple users",
@@ -198,7 +198,7 @@ export default function PortfolioPage() {
       category: "Real Estate",
       status: "completed",
       featured: false,
-      image: "/real-estate-platform.png",
+      image: "/images/portfolio/real-estate-platform.tiff",
       techStack: ["Next.js", "PostgreSQL", "Prisma", "NextAuth", "Cloudinary", "Mapbox", "Stripe"],
       challenges: [
         "Managing large property databases",
@@ -232,7 +232,7 @@ export default function PortfolioPage() {
       category: "Utility",
       status: "completed",
       featured: false,
-      image: "/weather-dashboard.png",
+      image: "/images/portfolio/weather-dashboard.tiff",
       techStack: ["React", "OpenWeather API", "Chart.js", "Leaflet Maps", "PWA", "Service Workers"],
       challenges: [
         "Integrating multiple weather APIs",
@@ -314,12 +314,19 @@ export default function PortfolioPage() {
           <div className="grid lg:grid-cols-3 gap-8">
             {featuredProjects.map((project) => (
               <Card key={project.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                <div className="h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Code className="h-8 w-8 text-primary" />
+                <div className="h-48 relative overflow-hidden">
+                  <img 
+                    src={project.image} 
+                    alt={project.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Code className="h-8 w-8 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-white drop-shadow-lg">{project.title}</h3>
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground">{project.title}</h3>
                   </div>
                 </div>
                 <div className="p-6">
@@ -407,13 +414,20 @@ export default function PortfolioPage() {
           <div className="grid lg:grid-cols-2 gap-8">
             {filteredProjects.map((project) => (
               <Card key={project.id} id={`project-${project.id}`} className="overflow-hidden hover:shadow-lg transition-all duration-300">
-                <div className="h-64 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Code className="h-10 w-10 text-primary" />
+                <div className="h-64 relative overflow-hidden">
+                  <img 
+                    src={project.image} 
+                    alt={project.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Code className="h-10 w-10 text-primary" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-white drop-shadow-lg">{project.title}</h3>
+                      <p className="text-white/90 mt-2 drop-shadow-lg">{project.category}</p>
                     </div>
-                    <h3 className="text-2xl font-bold text-foreground">{project.title}</h3>
-                    <p className="text-muted-foreground mt-2">{project.category}</p>
                   </div>
                 </div>
                 
