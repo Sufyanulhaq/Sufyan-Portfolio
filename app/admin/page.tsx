@@ -274,6 +274,12 @@ export default async function AdminPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full" size="sm">
+                <Link href="/admin/homepage">
+                  <Home className="mr-2 h-4 w-4" />
+                  Homepage CMS
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full" size="sm">
                 <Link href="/admin/media">
                   <Image className="mr-2 h-4 w-4" />
                   Media Library
