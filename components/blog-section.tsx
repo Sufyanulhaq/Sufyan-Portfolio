@@ -39,29 +39,54 @@ async function getLatestPosts(): Promise<Array<IPost & { _id: string; author: { 
 export default async function BlogSection() {
   const posts = await getLatestPosts()
 
-  if (posts.length === 0) {
-    return null
-  }
+  // Fallback to dummy data if no posts from database
+  const fallbackPosts = [
+    {
+      _id: "1",
+      title: "Building High-Performance React Applications",
+      excerpt: "Learn advanced techniques for optimizing React applications and improving user experience.",
+      category: "Development",
+      featured: true,
+      createdAt: new Date().toISOString(),
+      readTime: "8",
+      slug: "building-high-performance-react-applications"
+    },
+    {
+      _id: "2", 
+      title: "The Future of Web Development: AI Integration",
+      excerpt: "Explore how artificial intelligence is transforming web development and what it means for developers.",
+      category: "Technology",
+      featured: false,
+      createdAt: new Date().toISOString(),
+      readTime: "12",
+      slug: "future-of-web-development-ai-integration"
+    },
+    {
+      _id: "3",
+      title: "SEO Best Practices for 2025",
+      excerpt: "Stay ahead of the competition with these proven SEO strategies that will improve your rankings.",
+      category: "SEO",
+      featured: false,
+      createdAt: new Date().toISOString(),
+      readTime: "10",
+      slug: "seo-best-practices-2025"
+    }
+  ]
+
+  const displayPosts = posts.length > 0 ? posts : fallbackPosts
 
   return (
     <section className="py-20 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="font-heading text-3xl md:text-4xl font-bold mb-4">
-            Latest <span className="text-primary">Insights</span>
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Thoughts on web development, technology trends, and building better digital experiences.
-          </p>
-        </div>
+        
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-12">
-          {posts.map((post) => (
+          {displayPosts.map((post) => (
             <Card key={post._id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
               <div className="relative aspect-video overflow-hidden">
                 <Image
                   src={
-                    post.coverImage || 
+                    (post as any).coverImage || 
                     (post.category === "Development" && "/images/blogs/blog-post-1.jpg") ||
                     (post.category === "Technology" && "/images/blogs/blog-post-2.jpg") ||
                     (post.category === "SEO" && "/images/blogs/blog-post-3.jpg") ||
@@ -71,6 +96,8 @@ export default async function BlogSection() {
                   }
                   alt={post.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority={post.featured}
                   className="object-cover group-hover:scale-105 transition-transform duration-300 rounded-lg shadow-md"
                 />
                 {post.featured && (

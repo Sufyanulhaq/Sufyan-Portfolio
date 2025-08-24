@@ -80,7 +80,7 @@ export default function Footer() {
               <Link href="https://www.linkedin.com/in/sufyanulhaq/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <Linkedin className="h-6 w-6" />
               </Link>
-              <Link href="https://www.fiverr.com/sellers/nexgendev_" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+              <Link href="https://www.fiverr.com/nexgendev_" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                 <Globe className="h-6 w-6" />
               </Link>
               <Link href="https://www.upwork.com/freelancers/~013b81e78082f94d09" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
@@ -88,18 +88,7 @@ export default function Footer() {
               </Link>
             </div>
             
-            {/* WhatsApp Button */}
-            <div className="mt-4">
-              <Link 
-                href="https://wa.me/447469753723" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                <MessageCircle className="h-5 w-5" />
-                <span>Chat on WhatsApp</span>
-              </Link>
-            </div>
+
           </div>
 
           {/* Services */}

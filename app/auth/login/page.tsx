@@ -42,8 +42,10 @@ export default function LoginPage() {
         setError(`Login failed: ${result.error}`)
       } else if (result?.ok) {
         console.log("Sign in successful, redirecting...")
-        // Force a page reload to ensure session is updated
-        window.location.href = "/admin"
+        // Add a small delay to ensure session is properly established
+        setTimeout(() => {
+          window.location.href = "/admin"
+        }, 1000)
       } else {
         setError("Login failed - no result returned")
       }
