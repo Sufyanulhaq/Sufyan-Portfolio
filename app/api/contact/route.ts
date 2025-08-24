@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import connectDB from "@/lib/mongodb"
-import ContactForm from "@/models/ContactForm"
-import { sendContactNotification } from "@/lib/email"
+import { neon } from '@neondatabase/serverless'
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,7 +23,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    await connectDB()
+    // Check if we have database connection
+    if (!process.env.DATABASE_URL) {
+      throw new Error('Database not configured')
+    }
+
+    const sql = neon(process.env.DATABASE_URL)
 
     // Get client IP and user agent
     const ipAddress = request.headers.get("x-forwarded-for") || 
@@ -34,29 +37,24 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get("user-agent") || "unknown"
 
     // Create contact form entry
-    const contactForm = new ContactForm({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      subject: subject.trim(),
-      message: message.trim(),
-      phone: phone?.trim(),
-      website: website?.trim(),
-      source: source || "Website",
-      ipAddress,
-      userAgent,
-      status: "NEW",
-      priority: "MEDIUM"
-    })
+    const result = await sql`
+      INSERT INTO cms.contact_forms (
+        name, email, message, phone, source, ip_address, user_agent, status
+      ) VALUES (
+        ${name.trim()}, 
+        ${email.trim().toLowerCase()}, 
+        ${message.trim()}, 
+        ${phone?.trim() || null}, 
+        ${source || "Website"}, 
+        ${ipAddress}, 
+        ${userAgent}, 
+        'new'
+      ) RETURNING id
+    `
 
-    await contactForm.save()
-
-    // Send email notifications
-    try {
-      await sendContactNotification(contactForm)
-    } catch (emailError) {
-      console.error("Failed to send email notifications:", emailError)
-      // Don't fail the contact form submission if emails fail
-    }
+    // TODO: Send email notifications using Resend
+    // For now, just log the submission
+    console.log('Contact form submitted:', { id: result[0].id, email: email.trim() })
 
     return NextResponse.json({
       message: "Thank you for your message! I'll get back to you soon.",
@@ -82,18 +80,27 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    await connectDB()
+    // Check if we have database connection
+    if (!process.env.DATABASE_URL) {
+      throw new Error('Database not configured')
+    }
 
-    const contacts = await ContactForm.find({})
-      .sort({ createdAt: -1 })
-      .limit(100)
-      .lean()
+    const sql = neon(process.env.DATABASE_URL)
+
+    const contacts = await sql`
+      SELECT 
+        id, name, email, message, phone, source, ip_address, user_agent, 
+        status, is_read, created_at, updated_at
+      FROM cms.contact_forms 
+      ORDER BY created_at DESC 
+      LIMIT 100
+    `
 
     const formattedContacts = contacts.map((contact) => ({
       ...contact,
-      _id: contact._id.toString(),
-      createdAt: contact.createdAt.toISOString(),
-      updatedAt: contact.updatedAt.toISOString(),
+      id: contact.id.toString(),
+      created_at: contact.created_at?.toISOString(),
+      updated_at: contact.updated_at?.toISOString(),
     }))
 
     return NextResponse.json({ contacts: formattedContacts })

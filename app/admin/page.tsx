@@ -14,7 +14,8 @@ import {
   FolderOpen,
   Globe,
   Mail,
-  TrendingUp
+  TrendingUp,
+  Search
 } from 'lucide-react'
 import Link from 'next/link'
 import { neon } from '@neondatabase/serverless'
@@ -26,7 +27,7 @@ async function getDashboardStats() {
     const [postsCount, portfolioCount, servicesCount, contactFormsCount, unreadMessages] = await Promise.all([
       sql`SELECT COUNT(*) FROM cms.posts WHERE status = 'published'`,
       sql`SELECT COUNT(*) FROM cms.portfolio WHERE status = 'published'`,
-      sql`SELECT COUNT(*) FROM cms.services WHERE is_active = TRUE`,
+      sql`SELECT COUNT(*) FROM cms.services WHERE status = 'active'`,
       sql`SELECT COUNT(*) FROM cms.contact_forms`,
       sql`SELECT COUNT(*) FROM cms.contact_forms WHERE is_read = FALSE`
     ])
@@ -250,9 +251,9 @@ export default async function AdminPage() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full" size="sm">
-                <Link href="/admin/reports">
+                <Link href="/admin/analytics">
                   <TrendingUp className="mr-2 h-4 w-4" />
-                  Generate Reports
+                  View Analytics
                 </Link>
               </Button>
             </CardContent>
@@ -267,9 +268,9 @@ export default async function AdminPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <Button asChild className="w-full" size="sm">
-                <Link href="/admin/settings">
-                  <Settings className="mr-2 h-4 w-4" />
-                  General Settings
+                <Link href="/admin/seo">
+                  <Search className="mr-2 h-4 w-4" />
+                  SEO Settings
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full" size="sm">

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import connectDB from "@/lib/mongodb"
-import Post from "@/models/Post"
+import { neon } from '@neondatabase/serverless'
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,49 +10,76 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || ""
     const featured = searchParams.get("featured") || "all"
     
-    await connectDB()
+    // Check if we have database connection
+    if (!process.env.DATABASE_URL) {
+      throw new Error('Database not configured')
+    }
 
-    // Build query
-    const query: any = { published: true }
-    
+    const sql = neon(process.env.DATABASE_URL)
+
+    // Build query conditions
+    let whereConditions = "WHERE p.status = 'published'"
+    const queryParams: any[] = []
+    let paramIndex = 1
+
     if (category !== "all") {
-      query.category = category
+      whereConditions += ` AND p.category = $${paramIndex}`
+      queryParams.push(category)
+      paramIndex++
     }
     
     if (featured !== "all") {
-      query.featured = featured === "true"
+      whereConditions += ` AND p.featured = $${paramIndex}`
+      queryParams.push(featured === "true")
+      paramIndex++
     }
     
     if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { excerpt: { $regex: search, $options: "i" } },
-        { content: { $regex: search, $options: "i" } },
-      ]
+      whereConditions += ` AND (p.title ILIKE $${paramIndex} OR p.excerpt ILIKE $${paramIndex} OR p.content ILIKE $${paramIndex})`
+      queryParams.push(`%${search}%`)
+      paramIndex++
     }
 
     // Execute query with pagination
-    const skip = (page - 1) * limit
+    const offset = (page - 1) * limit
     
-    const [posts, total] = await Promise.all([
-      Post.find(query)
-        .populate("author", "name")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Post.countDocuments(query),
+    const postsQuery = `
+      SELECT 
+        p.id, p.title, p.slug, p.excerpt, p.content, p.category, p.tags,
+        p.featured, p.status, p.read_time, p.views_count, p.likes_count,
+        p.created_at, p.updated_at, p.published_at,
+        u.name as author_name
+      FROM cms.posts p
+      LEFT JOIN cms.users u ON p.author_id = u.id
+      ${whereConditions}
+      ORDER BY p.created_at DESC
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `
+    
+    const countQuery = `
+      SELECT COUNT(*) 
+      FROM cms.posts p
+      ${whereConditions}
+    `
+
+    queryParams.push(limit, offset)
+    
+    const [posts, totalResult] = await Promise.all([
+      sql.unsafe(postsQuery, queryParams),
+      sql.unsafe(countQuery, queryParams.slice(0, -2))
     ])
+
+    const total = parseInt(totalResult[0]?.count || '0')
 
     const formattedPosts = posts.map((post) => ({
       ...post,
-      _id: post._id.toString(),
-      author: post.author ? {
-        ...post.author,
-        _id: post.author._id.toString(),
+      id: post.id.toString(),
+      author: post.author_name ? {
+        name: post.author_name,
       } : null,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
+      created_at: post.created_at?.toISOString(),
+      updated_at: post.updated_at?.toISOString(),
+      published_at: post.published_at?.toISOString(),
     }))
 
     return NextResponse.json({
