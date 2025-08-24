@@ -1,361 +1,355 @@
-"use client"
+import { getSession } from '@/lib/auth-actions'
+import { redirect } from 'next/navigation'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { 
+  TrendingUp, 
+  Users, 
+  Eye, 
+  Mail,
+  FileText,
+  Briefcase,
+  Settings,
+  Calendar,
+  Clock,
+  BarChart3,
+  Activity,
+  Edit,
+  Trash2
+} from 'lucide-react'
+import { neon } from '@neondatabase/serverless'
 
-import { useState, useEffect } from "react"
+// Force dynamic rendering to prevent Vercel build issues
+export const dynamic = 'force-dynamic'
 
+async function getAnalyticsData() {
+  try {
+    const sql = neon(process.env.DATABASE_URL!)
+    
+    // Get basic counts
+    const [postsCount, portfolioCount, servicesCount, contactFormsCount] = await Promise.all([
+      sql`SELECT COUNT(*) FROM cms.posts WHERE status = 'published'`,
+      sql`SELECT COUNT(*) FROM cms.portfolio WHERE status = 'published'`,
+      sql`SELECT COUNT(*) FROM cms.services WHERE status = 'active'`,
+      sql`SELECT COUNT(*) FROM cms.contact_forms`
+    ])
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Calendar, TrendingUp, TrendingDown, Users, Eye, Heart, MousePointer, Globe } from "lucide-react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts"
+    // Get recent activity
+    const recentActivity = await sql`
+      SELECT 
+        al.action,
+        al.table_name,
+        al.record_id,
+        al.new_values,
+        al.created_at,
+        u.name as user_name
+      FROM cms.activity_logs al
+      LEFT JOIN cms.users u ON al.user_id = u.id
+      ORDER BY al.created_at DESC
+      LIMIT 10
+    `
 
-interface AnalyticsData {
-  pageViews: ChartData[]
-  uniqueVisitors: ChartData[]
-  topPages: PageData[]
-  trafficSources: SourceData[]
-  userBehavior: BehaviorData[]
-  conversions: ConversionData[]
+    // Get contact form trends (last 7 days)
+    const contactTrends = await sql`
+      SELECT 
+        DATE(created_at) as date,
+        COUNT(*) as count
+      FROM cms.contact_forms 
+      WHERE created_at >= NOW() - INTERVAL '7 days'
+      GROUP BY DATE(created_at)
+      ORDER BY date DESC
+    `
+
+    // Get unread messages
+    const unreadMessages = await sql`
+      SELECT COUNT(*) FROM cms.contact_forms WHERE is_read = FALSE
+    `
+
+    return {
+      postsCount: parseInt(postsCount[0].count),
+      portfolioCount: parseInt(portfolioCount[0].count),
+      servicesCount: parseInt(servicesCount[0].count),
+      contactFormsCount: parseInt(contactFormsCount[0].count),
+      unreadMessages: parseInt(unreadMessages[0].count),
+      recentActivity: recentActivity.map(activity => ({
+        ...activity,
+        created_at: activity.created_at?.toISOString()
+      })),
+      contactTrends: contactTrends.map(trend => ({
+        ...trend,
+        date: trend.date?.toISOString()
+      }))
+    }
+  } catch (error) {
+    console.error('Error fetching analytics data:', error)
+    return {
+      postsCount: 0,
+      portfolioCount: 0,
+      servicesCount: 0,
+      contactFormsCount: 0,
+      unreadMessages: 0,
+      recentActivity: [],
+      contactTrends: []
+    }
+  }
 }
 
-interface ChartData {
-  date: string
-  value: number
-}
+export default async function AnalyticsPage() {
+  const session = await getSession()
+  if (!session) redirect('/auth/login')
+  
+  const analytics = await getAnalyticsData()
 
-interface PageData {
-  page: string
-  views: number
-  uniqueVisitors: number
-  bounceRate: number
-}
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
 
-interface SourceData {
-  source: string
-  visitors: number
-  percentage: number
-}
-
-interface BehaviorData {
-  action: string
-  count: number
-  percentage: number
-}
-
-interface ConversionData {
-  goal: string
-  conversions: number
-  rate: number
-}
-
-const mockAnalyticsData: AnalyticsData = {
-  pageViews: [
-    { date: "2024-01-01", value: 1200 },
-    { date: "2024-01-02", value: 1350 },
-    { date: "2024-01-03", value: 1100 },
-    { date: "2024-01-04", value: 1600 },
-    { date: "2024-01-05", value: 1400 },
-    { date: "2024-01-06", value: 1800 },
-    { date: "2024-01-07", value: 2000 },
-  ],
-  uniqueVisitors: [
-    { date: "2024-01-01", value: 800 },
-    { date: "2024-01-02", value: 950 },
-    { date: "2024-01-03", value: 750 },
-    { date: "2024-01-04", value: 1100 },
-    { date: "2024-01-05", value: 900 },
-    { date: "2024-01-06", value: 1200 },
-    { date: "2024-01-07", value: 1400 },
-  ],
-  topPages: [
-    { page: "/", views: 2500, uniqueVisitors: 1800, bounceRate: 35 },
-    { page: "/portfolio", views: 1800, uniqueVisitors: 1200, bounceRate: 25 },
-    { page: "/blog", views: 1500, uniqueVisitors: 1000, bounceRate: 40 },
-    { page: "/services", views: 1200, uniqueVisitors: 800, bounceRate: 30 },
-    { page: "/about", views: 800, uniqueVisitors: 600, bounceRate: 45 },
-  ],
-  trafficSources: [
-    { source: "Direct", visitors: 2500, percentage: 40 },
-    { source: "Organic Search", visitors: 2000, percentage: 32 },
-    { source: "Social Media", visitors: 1200, percentage: 19 },
-    { source: "Referral", visitors: 500, percentage: 8 },
-    { source: "Email", visitors: 100, percentage: 1 },
-  ],
-  userBehavior: [
-    { action: "Page View", count: 8000, percentage: 100 },
-    { action: "Portfolio Click", count: 2400, percentage: 30 },
-    { action: "Contact Form", count: 800, percentage: 10 },
-    { action: "Blog Read", count: 1600, percentage: 20 },
-    { action: "Download Resume", count: 400, percentage: 5 },
-  ],
-  conversions: [
-    { goal: "Contact Form", conversions: 800, rate: 10 },
-    { goal: "Portfolio View", conversions: 2400, rate: 30 },
-    { goal: "Blog Engagement", conversions: 1600, rate: 20 },
-    { goal: "Resume Download", conversions: 400, rate: 5 },
-  ],
-}
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"]
-
-export default function AnalyticsPage() {
-  const [timeRange, setTimeRange] = useState("7d")
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>(mockAnalyticsData)
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    fetchAnalytics()
-  }, [timeRange])
-
-  const fetchAnalytics = async () => {
-    setIsLoading(true)
-    try {
-      // In a real app, you'd fetch from your analytics API
-      // const response = await fetch(`/api/admin/analytics?range=${timeRange}`)
-      // const data = await response.json()
-      // setAnalyticsData(data)
-      
-      // For now, using mock data
-      setTimeout(() => {
-        setAnalyticsData(mockAnalyticsData)
-        setIsLoading(false)
-      }, 1000)
-    } catch (error) {
-      console.error("Error fetching analytics:", error)
-      setIsLoading(false)
+  const getActionIcon = (action: string) => {
+    switch (action) {
+      case 'create': return <Activity className="h-4 w-4 text-green-600" />
+      case 'update': return <Edit className="h-4 w-4 text-blue-600" />
+      case 'delete': return <Trash2 className="h-4 w-4 text-red-600" />
+      case 'respond': return <Mail className="h-4 w-4 text-purple-600" />
+      default: return <Activity className="h-4 w-4 text-gray-600" />
     }
   }
 
-  const calculateGrowth = (current: number, previous: number) => {
-    if (previous === 0) return 100
-    return ((current - previous) / previous) * 100
+  const getActionColor = (action: string) => {
+    switch (action) {
+      case 'create': return 'bg-green-100 text-green-800'
+      case 'update': return 'bg-blue-100 text-blue-800'
+      case 'delete': return 'bg-red-100 text-red-800'
+      case 'respond': return 'bg-purple-100 text-purple-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
   }
 
-  const formatNumber = (num: number) => {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + "M"
-    if (num >= 1000) return (num / 1000).toFixed(1) + "K"
-    return num.toString()
-  }
-
-  if (isLoading) {
-    return (
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-heading text-3xl font-bold">Analytics Dashboard</h1>
-            <p className="text-muted-foreground">Track your website performance and user behavior</p>
-          </div>
-        </div>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-        </div>
-      </div>
-    )
-  }
+  // Type the data properly to avoid TypeScript errors
+  const typedContactTrends = analytics.contactTrends as Array<{ date: string; count: number }>
+  const typedRecentActivity = analytics.recentActivity as Array<{ 
+    action: string; 
+    table_name: string; 
+    record_id: number; 
+    new_values: any; 
+    created_at: string; 
+    user_name: string 
+  }>
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-heading text-3xl font-bold">Analytics Dashboard</h1>
-          <p className="text-muted-foreground">Track your website performance and user behavior</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">Last 7 days</SelectItem>
-              <SelectItem value="30d">Last 30 days</SelectItem>
-              <SelectItem value="90d">Last 90 days</SelectItem>
-              <SelectItem value="1y">Last year</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline">
-            <Calendar className="mr-2 h-4 w-4" />
-            Export Report
-          </Button>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b bg-card">
+        <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-2xl font-bold">Analytics Dashboard</h1>
+            <span className="text-sm text-muted-foreground">
+              Website performance and business insights
+            </span>
+          </div>
+          <div className="ml-auto flex items-center space-x-4">
+            <Badge variant="outline">
+              <Calendar className="mr-2 h-4 w-4" />
+              Last 30 days
+            </Badge>
+          </div>
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Page Views</CardTitle>
-            <Eye className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatNumber(8000)}</div>
-            <div className="flex items-center text-xs text-muted-foreground">
-              <TrendingUp className="mr-1 h-3 w-3 text-green-600" />
-              +12.5% from last period
-            </div>
-          </CardContent>
-        </Card>
+      {/* Main Content */}
+      <div className="p-6 sm:p-8 lg:p-12">
+        {/* Key Metrics */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Published Posts</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analytics.postsCount}</div>
+              <p className="text-xs text-muted-foreground">
+                Blog content live
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Unique Visitors</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatNumber(4200)}</div>
-            <div className="flex items-center text-xs text-muted-foreground">
-              <TrendingUp className="mr-1 h-3 w-3 text-green-600" />
-              +8.2% from last period
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Portfolio Projects</CardTitle>
+              <Briefcase className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analytics.portfolioCount}</div>
+              <p className="text-xs text-muted-foreground">
+                Projects showcased
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bounce Rate</CardTitle>
-            <MousePointer className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">32.5%</div>
-            <div className="flex items-center text-xs text-muted-foreground">
-              <TrendingDown className="mr-1 h-3 w-3 text-green-600" />
-              -2.1% from last period
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Services</CardTitle>
+              <Settings className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analytics.servicesCount}</div>
+              <p className="text-xs text-muted-foreground">
+                Services offered
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
-            <Heart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">15.8%</div>
-            <div className="flex items-center text-xs text-muted-foreground">
-              <TrendingUp className="mr-1 h-3 w-3 text-green-600" />
-              +5.3% from last period
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Inquiries</CardTitle>
+              <Mail className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analytics.contactFormsCount}</div>
+              <p className="text-xs text-muted-foreground">
+                {analytics.unreadMessages} unread
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* Charts */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Page Views & Visitors</CardTitle>
-            <CardDescription>Daily website traffic over time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={analyticsData.pageViews}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#0ea5e9" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        {/* Performance Overview */}
+        <div className="grid gap-6 md:grid-cols-2 mb-8">
+          {/* Contact Form Trends */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Contact Form Trends (Last 7 Days)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+                             {typedContactTrends.length === 0 ? (
+                 <div className="text-center py-8">
+                   <Mail className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                   <p className="text-muted-foreground">No recent inquiries</p>
+                 </div>
+               ) : (
+                 <div className="space-y-3">
+                   {typedContactTrends.map((trend, index) => (
+                     <div key={index} className="flex items-center justify-between">
+                       <span className="text-sm font-medium">
+                         {trend.date ? new Date(trend.date).toLocaleDateString('en-US', { 
+                           month: 'short', 
+                           day: 'numeric' 
+                         }) : 'Unknown'}
+                       </span>
+                       <div className="flex items-center gap-2">
+                         <div className="w-20 bg-muted rounded-full h-2">
+                           <div 
+                             className="bg-primary h-2 rounded-full" 
+                             style={{ width: `${Math.min((trend.count / Math.max(...typedContactTrends.map(t => t.count))) * 100, 100)}%` }}
+                           ></div>
+                         </div>
+                         <span className="text-sm font-medium w-8 text-right">
+                           {trend.count}
+                         </span>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+               )}
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Traffic Sources</CardTitle>
-            <CardDescription>Where your visitors come from</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={analyticsData.trafficSources}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ source, percentage }) => `${source} ${percentage}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="visitors"
-                >
-                  {analyticsData.trafficSources.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Top Pages */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Top Performing Pages</CardTitle>
-          <CardDescription>Most viewed pages on your website</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {analyticsData.topPages.map((page, index) => (
-              <div key={page.page} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <Badge variant="secondary">{index + 1}</Badge>
-                  <div>
-                    <h3 className="font-medium">{page.page}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {formatNumber(page.views)} views • {formatNumber(page.uniqueVisitors)} unique visitors
-                    </p>
+          {/* Quick Stats */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Quick Statistics
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {analytics.contactFormsCount > 0 ? 
+                      Math.round((analytics.unreadMessages / analytics.contactFormsCount) * 100) : 0}%
                   </div>
+                  <p className="text-xs text-muted-foreground">Response Rate</p>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm font-medium">{page.bounceRate}%</div>
-                  <div className="text-xs text-muted-foreground">Bounce Rate</div>
+                
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">
+                    {analytics.postsCount + analytics.portfolioCount + analytics.servicesCount}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Total Content</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* User Behavior */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>User Behavior</CardTitle>
-            <CardDescription>How users interact with your website</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={analyticsData.userBehavior}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="action" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="#0ea5e9" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Conversion Goals</CardTitle>
-            <CardDescription>Key conversion metrics</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {analyticsData.conversions.map((goal) => (
-                <div key={goal.goal} className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium">{goal.goal}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {formatNumber(goal.conversions)} conversions
-                    </p>
-                  </div>
-                  <Badge variant="secondary">{goal.rate}%</Badge>
+              
+              <div className="text-center p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-purple-600">
+                  {analytics.contactFormsCount > 0 ? 
+                    Math.round(analytics.contactFormsCount / 30) : 0}
                 </div>
-              ))}
-            </div>
+                <p className="text-xs text-muted-foreground">Avg. Inquiries/Day</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Recent Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+                         {typedRecentActivity.length === 0 ? (
+               <div className="text-center py-8">
+                 <Activity className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                 <p className="text-muted-foreground">No recent activity</p>
+               </div>
+             ) : (
+               <div className="space-y-3">
+                 {typedRecentActivity.map((activity, index) => (
+                   <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
+                     <div className="flex-shrink-0">
+                       {getActionIcon(activity.action)}
+                     </div>
+                     
+                     <div className="flex-1 min-w-0">
+                       <div className="flex items-center gap-2 mb-1">
+                         <Badge className={getActionColor(activity.action)}>
+                           {activity.action.charAt(0).toUpperCase() + activity.action.slice(1)}
+                         </Badge>
+                         <span className="text-sm font-medium">
+                           {activity.user_name || 'System'}
+                         </span>
+                       </div>
+                       
+                       <p className="text-sm text-muted-foreground">
+                         {activity.action === 'create' ? 'Created new' :
+                          activity.action === 'update' ? 'Updated' :
+                          activity.action === 'delete' ? 'Deleted' :
+                          activity.action === 'respond' ? 'Responded to' : 'Modified'} 
+                         {activity.table_name === 'posts' ? ' blog post' :
+                          activity.table_name === 'portfolio' ? ' portfolio project' :
+                          activity.table_name === 'services' ? ' service' :
+                          activity.table_name === 'contact_forms' ? ' contact form' :
+                          ` ${activity.table_name}`}
+                       </p>
+                     </div>
+                     
+                     <div className="text-xs text-muted-foreground flex-shrink-0">
+                       {activity.created_at ? formatDate(activity.created_at) : 'Unknown'}
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             )}
           </CardContent>
         </Card>
       </div>
