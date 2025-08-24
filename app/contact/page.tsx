@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { 
   Mail, 
   Phone, 
@@ -20,7 +21,10 @@ import {
   Globe,
   Send,
   Calendar,
-  Target
+  Target,
+  Github,
+  Linkedin,
+  ExternalLink
 } from "lucide-react"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
@@ -44,7 +48,7 @@ export default function ContactPage() {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState("")
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: string } }) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
@@ -97,13 +101,15 @@ export default function ContactPage() {
       icon: Mail,
       title: "Email",
       value: "hello@sufyanulhaq.com",
-      description: "Send me a message anytime"
+      description: "Send me a message anytime",
+      link: "mailto:hello@sufyanulhaq.com"
     },
     {
       icon: Phone,
       title: "Phone",
       value: "+44 746 975 3723",
-      description: "Available during business hours"
+      description: "Available during business hours",
+      link: "tel:+447469753723"
     },
     {
       icon: MapPin,
@@ -116,6 +122,37 @@ export default function ContactPage() {
       title: "Response Time",
       value: "Within 24 hours",
       description: "Quick turnaround guaranteed"
+    }
+  ]
+
+  const socialLinks = [
+    {
+      icon: Github,
+      title: "GitHub",
+      value: "@Sufyanulhaq",
+      description: "View my code and projects",
+      link: "https://github.com/Sufyanulhaq"
+    },
+    {
+      icon: Linkedin,
+      title: "LinkedIn",
+      value: "sufyanulhaq",
+      description: "Connect professionally",
+      link: "https://www.linkedin.com/in/sufyanulhaq/"
+    },
+    {
+      icon: ExternalLink,
+      title: "Fiverr",
+      value: "nexgendev",
+      description: "Hire me on Fiverr",
+      link: "https://www.fiverr.com/sellers/nexgendev_"
+    },
+    {
+      icon: ExternalLink,
+      title: "Upwork",
+      value: "sufyanulhaq",
+      description: "Hire me on Upwork",
+      link: "https://www.upwork.com/freelancers/~013b81e78082f94d09"
     }
   ]
 
@@ -234,14 +271,69 @@ export default function ContactPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {contactInfo.map((info, index) => (
               <Card key={index} className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <info.icon className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{info.title}</h3>
-                <p className="text-primary font-medium mb-2">{info.value}</p>
-                <p className="text-sm text-muted-foreground">{info.description}</p>
+                {info.link ? (
+                  <Link href={info.link} className="block">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <info.icon className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">{info.title}</h3>
+                    <p className="text-primary font-medium mb-2">{info.value}</p>
+                    <p className="text-sm text-muted-foreground">{info.description}</p>
+                  </Link>
+                ) : (
+                  <>
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <info.icon className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">{info.title}</h3>
+                    <p className="text-primary font-medium mb-2">{info.value}</p>
+                    <p className="text-sm text-muted-foreground">{info.description}</p>
+                  </>
+                )}
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Social Media & Professional Links */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Connect With Me
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Follow my work, connect professionally, or hire me through your preferred platform.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {socialLinks.map((link, index) => (
+              <Card key={index} className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <link.icon className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{link.title}</h3>
+                <p className="text-primary font-medium mb-2">{link.value}</p>
+                <p className="text-sm text-muted-foreground mb-4">{link.description}</p>
+                <Button asChild variant="outline" size="sm" className="w-full">
+                  <Link href={link.link} target="_blank" rel="noopener noreferrer">
+                    Visit Profile
+                  </Link>
+                </Button>
+              </Card>
+            ))}
+          </div>
+
+          {/* WhatsApp Button */}
+          <div className="text-center mt-12">
+            <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-white">
+              <Link href="https://wa.me/447469753723?text=Hi%20Sufyan,%20I%20saw%20your%20portfolio%20and%20would%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener noreferrer">
+                <MessageSquare className="mr-2 h-5 w-5" />
+                Chat on WhatsApp
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -393,25 +485,36 @@ export default function ContactPage() {
                       <label htmlFor="budget" className="block text-sm font-medium text-foreground mb-2">
                         Budget Range
                       </label>
-                      <Input
-                        id="budget"
-                        name="budget"
-                        value={formData.budget}
-                        onChange={handleInputChange}
-                        placeholder="£5K - £25K"
-                      />
+                      <Select name="budget" value={formData.budget} onValueChange={(value) => handleInputChange({ target: { name: 'budget', value } })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your budget range" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="$1K-$5K">$1K - $5K</SelectItem>
+                          <SelectItem value="$5K-$10K">$5K - $10K</SelectItem>
+                          <SelectItem value="$10K-$25K">$10K - $25K</SelectItem>
+                          <SelectItem value="$25K-$50K">$25K - $50K</SelectItem>
+                          <SelectItem value="$50K+">$50K+</SelectItem>
+                          <SelectItem value="Not Sure">Not Sure</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div>
                       <label htmlFor="timeline" className="block text-sm font-medium text-foreground mb-2">
                         Timeline
                       </label>
-                      <Input
-                        id="timeline"
-                        name="timeline"
-                        value={formData.timeline}
-                        onChange={handleInputChange}
-                        placeholder="3-6 months"
-                      />
+                      <Select name="timeline" value={formData.timeline} onValueChange={(value) => handleInputChange({ target: { name: 'timeline', value } })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your timeline" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ASAP">ASAP</SelectItem>
+                          <SelectItem value="1-2 weeks">1-2 weeks</SelectItem>
+                          <SelectItem value="1-2 months">1-2 months</SelectItem>
+                          <SelectItem value="3+ months">3+ months</SelectItem>
+                          <SelectItem value="Not Sure">Not Sure</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 
