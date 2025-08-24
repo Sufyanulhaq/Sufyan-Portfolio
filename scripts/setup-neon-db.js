@@ -13,14 +13,16 @@ async function setupDatabase() {
 
     const sql = neon(process.env.DATABASE_URL);
     
-    // Create schema and table
+    // Create schema if it doesn't exist
     console.log('📋 Creating database schema...');
-    await sql`
-      CREATE SCHEMA IF NOT EXISTS neon_auth;
-    `;
+    await sql`CREATE SCHEMA IF NOT EXISTS neon_auth;`;
     
+    // Drop existing table if it exists to avoid conflicts
+    await sql`DROP TABLE IF EXISTS neon_auth.users_sync CASCADE;`;
+    
+    // Create fresh table with minimal constraints - using the most basic Neon-compatible structure
     await sql`
-      CREATE TABLE IF NOT EXISTS neon_auth.users_sync (
+      CREATE TABLE neon_auth.users_sync (
         id SERIAL PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
         name TEXT,
@@ -31,18 +33,18 @@ async function setupDatabase() {
     
     console.log('✅ Database schema created successfully');
     
-    // Create admin user
+    // Create admin user with explicit NULL for optional fields
     console.log('\n👤 Creating admin user...');
     const hashedPassword = await bcrypt.hash('admin123', 12);
     
     await sql`
-      INSERT INTO neon_auth.users_sync (email, name, raw_json)
+      INSERT INTO neon_auth.users_sync (email, name, raw_json, deleted_at)
       VALUES (
         'admin@example.com',
         'Admin User',
-        ${JSON.stringify({ password: hashedPassword })}
-      )
-      ON CONFLICT (email) DO NOTHING;
+        ${JSON.stringify({ password: hashedPassword })},
+        NULL
+      );
     `;
     
     console.log('✅ Admin user created successfully');
