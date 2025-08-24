@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import Link from "next/link"
 
 // Prevent prerendering
 export const dynamic = "force-dynamic"
@@ -53,8 +54,8 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-4 p-3 bg-muted rounded-lg text-xs text-muted-foreground">
-            <p><strong>Test Credentials:</strong></p>
-            <p>Email: sufyan@example.com</p>
+            <p><strong>Admin Credentials:</strong></p>
+            <p>Email: admin@example.com</p>
             <p>Password: admin123</p>
           </div>
         </CardContent>
