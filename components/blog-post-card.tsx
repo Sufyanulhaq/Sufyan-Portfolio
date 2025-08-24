@@ -72,11 +72,17 @@ export default function BlogPostCard({ post, variant = "default" }: BlogPostCard
       <div className="relative aspect-video overflow-hidden">
         <Image
           src={
-            post.coverImage || `/placeholder.svg?height=240&width=400&query=${encodeURIComponent(post.title)}`
+            post.coverImage || 
+            (post.category === "Development" && "/images/blog-post-1.jpg") ||
+            (post.category === "Technology" && "/images/blog-post-2.jpg") ||
+            (post.category === "SEO" && "/images/blog-post-3.jpg") ||
+            (post.category === "Backend" && "/images/blog-post-1.jpg") ||
+            (post.category === "Performance" && "/images/blog-post-2.jpg") ||
+            "/images/blog-post-3.jpg"
           }
           alt={post.title}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          className="object-cover group-hover:scale-105 transition-transform duration-300 rounded-lg shadow-md"
         />
         {isFeatured && (
           <Badge className="absolute top-4 left-4 bg-accent text-accent-foreground">Featured</Badge>
