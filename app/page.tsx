@@ -21,8 +21,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
         {/* Professional Development Workspace Background */}
-        <div className="absolute inset-0 bg-[url('/images/hero-background.jpg')] bg-cover bg-center opacity-20"></div>
-        
+        {/* <div className="absolute inset-0 bg-[url('/images/hero-background.jpg')] bg-cover bg-center opacity-20"></div> */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center space-y-8">
             {/* Main Headline */}
@@ -467,7 +466,7 @@ export default async function HomePage() {
                   <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-              <p className="text-foreground mb-4">
+              <p className="text-muted-foreground mb-4">
                 "Professional, reliable, and incredibly talented. Sufyan delivered our project on time and within budget."
               </p>
               <div className="flex items-center gap-3">
