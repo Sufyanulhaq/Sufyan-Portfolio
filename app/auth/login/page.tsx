@@ -1,14 +1,41 @@
+'use client'
+
 import { loginAction } from '@/lib/auth-actions'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 // Prevent prerendering
 export const dynamic = "force-dynamic"
 
 export default function LoginPage() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const router = useRouter()
+
+  const handleSubmit = async (formData: FormData) => {
+    setIsLoading(true)
+    setError('')
+    
+    try {
+      const result = await loginAction(formData)
+      
+      if (result?.error) {
+        setError(result.error)
+      } else if (result?.success) {
+        // Redirect to admin panel
+        router.push('/admin')
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -18,7 +45,13 @@ export default function LoginPage() {
           <CardDescription className="text-center">Enter your credentials to access your account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={loginAction} className="space-y-4">
+          <form action={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -27,6 +60,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="Enter your email"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -38,11 +72,12 @@ export default function LoginPage() {
                 type="password"
                 placeholder="Enter your password"
                 required
+                disabled={isLoading}
               />
             </div>
 
-            <Button type="submit" className="w-full">
-              Sign In
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
 

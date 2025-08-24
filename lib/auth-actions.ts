@@ -37,7 +37,8 @@ export async function loginAction(formData: FormData) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
     })
 
-    redirect('/admin')
+    // Return success instead of redirect to avoid NEXT_REDIRECT error
+    return { success: true, redirectTo: '/admin' }
   } catch (err) {
     console.error('Login error:', err)
     return { error: 'Login failed' }
