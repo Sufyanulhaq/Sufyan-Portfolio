@@ -70,7 +70,7 @@ export async function getSession() {
   try {
     const sql = neon(process.env.DATABASE_URL!)
     const users = await sql`
-      SELECT id, email, name, role, avatar, last_login
+      SELECT id, email, name, role, avatar_url, last_login
       FROM cms.users
       WHERE id = ${sessionId}
       AND is_active = TRUE
