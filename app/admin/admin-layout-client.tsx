@@ -57,7 +57,7 @@ export default function AdminLayoutClient({
 
   useEffect(() => {
     if (status === "loading") return
-    if (!session || session.user?.role !== "ADMIN") {
+    if (!session || (session.user?.role !== "ADMIN" && session.user?.role !== "SUPER_ADMIN")) {
       router.push("/auth/login")
     }
   }, [session, status, router])
@@ -70,7 +70,7 @@ export default function AdminLayoutClient({
     )
   }
 
-  if (!session || session.user?.role !== "ADMIN") {
+  if (!session || (session.user?.role !== "ADMIN" && session.user?.role !== "SUPER_ADMIN")) {
     return null
   }
 
