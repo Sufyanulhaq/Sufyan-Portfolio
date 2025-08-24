@@ -137,11 +137,3 @@ export async function GET(request: NextRequest) {
     )
   }
 }
-        error: "Failed to fetch portfolio projects",
-        details: error.message,
-        type: error.name
-      },
-      { status: 500 }
-    )
-  }
-}
