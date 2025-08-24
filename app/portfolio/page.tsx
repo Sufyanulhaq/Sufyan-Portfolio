@@ -62,7 +62,7 @@ export default function PortfolioPage() {
       category: "SaaS",
       status: "completed",
       featured: true,
-      image: "/modern-ecommerce-dashboard.png",
+      image: "/images/projects/analytics-dashboard.jpg",
       techStack: ["React", "TypeScript", "Node.js", "PostgreSQL", "Redis", "D3.js", "Chart.js", "AWS"],
       challenges: [
         "Complex data aggregation from multiple sources",
@@ -96,7 +96,7 @@ export default function PortfolioPage() {
       category: "E-commerce",
       status: "completed",
       featured: true,
-      image: "/modern-ecommerce-dashboard.png",
+      image: "/images/projects/ecommerce-platform.jpg",
       techStack: ["Next.js", "Stripe", "PostgreSQL", "Redis", "Tailwind CSS", "Framer Motion", "Vercel"],
       challenges: [
         "Handling high traffic during sales events",
@@ -130,7 +130,7 @@ export default function PortfolioPage() {
       category: "Marketing",
       status: "completed",
       featured: true,
-      image: "/modern-portfolio-website.png",
+      image: "/images/projects/lead-generation.jpg",
       techStack: ["Vue.js", "Laravel", "MySQL", "Mailchimp", "Google Analytics", "Hotjar", "CloudFlare"],
       challenges: [
         "Creating compelling lead capture forms",

@@ -82,6 +82,7 @@ export default async function HomePage() {
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-purple-900/20 to-pink-900/20"></div>
         <div className="absolute inset-0 bg-[url('/images/ai-generated/backgrounds/tech-expertise-pattern.svg')] bg-repeat opacity-15"></div>
+
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
