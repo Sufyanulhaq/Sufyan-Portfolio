@@ -15,20 +15,26 @@ export async function loginAction(formData: FormData) {
     const sql = neon(process.env.DATABASE_URL!)
 
     const users = await sql`
-      SELECT id, email, name, raw_json
-      FROM neon_auth.users_sync
+      SELECT id, email, name, role, password
+      FROM cms.users
       WHERE email = ${email}
-      AND deleted_at IS NULL
+      AND is_active = TRUE
       LIMIT 1
     `
 
     if (users.length === 0) return { error: 'Invalid credentials' }
 
     const user = users[0]
-    const userData = user.raw_json as any
 
-    const isPasswordValid = await bcrypt.compare(password, userData.password)
+    const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) return { error: 'Invalid credentials' }
+
+    // Update last login
+    await sql`
+      UPDATE cms.users 
+      SET last_login = NOW() 
+      WHERE id = ${user.id}
+    `
 
     cookies().set('admin-session', user.id.toString(), {
       httpOnly: true,
@@ -38,7 +44,7 @@ export async function loginAction(formData: FormData) {
     })
 
     // Return success instead of redirect to avoid NEXT_REDIRECT error
-    return { success: true, redirectTo: '/admin' }
+    return { success: true, redirectTo: '/admin', user: { id: user.id, name: user.name, role: user.role } }
   } catch (err) {
     console.error('Login error:', err)
     return { error: 'Login failed' }
@@ -57,10 +63,10 @@ export async function getSession() {
   try {
     const sql = neon(process.env.DATABASE_URL!)
     const users = await sql`
-      SELECT id, email, name
-      FROM neon_auth.users_sync
+      SELECT id, email, name, role, avatar, last_login
+      FROM cms.users
       WHERE id = ${sessionId}
-      AND deleted_at IS NULL
+      AND is_active = TRUE
       LIMIT 1
     `
     return users[0] || null
