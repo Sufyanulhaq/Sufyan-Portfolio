@@ -20,8 +20,6 @@ import {
   Zap,
   Globe,
   Send,
-  Calendar,
-  Target,
   Github,
   Linkedin,
   ExternalLink

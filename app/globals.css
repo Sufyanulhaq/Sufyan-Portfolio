@@ -38,8 +38,8 @@
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.567 0.149 198.4);
-  --font-open-sans: "Open Sans", sans-serif;
-  --font-work-sans: "Work Sans", sans-serif;
+  --font-open-sans: "Inter", sans-serif;
+  --font-work-sans: "Inter", sans-serif;
 }
 
 .dark {
@@ -137,5 +137,51 @@
   h6 {
     font-family: var(--font-heading);
     font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+  
+  /* Improved spacing and typography */
+  .prose {
+    @apply text-foreground;
+  }
+  
+  .prose h1 {
+    @apply text-4xl md:text-5xl font-bold mb-6;
+  }
+  
+  .prose h2 {
+    @apply text-3xl md:text-4xl font-semibold mb-4 mt-8;
+  }
+  
+  .prose h3 {
+    @apply text-2xl md:text-3xl font-semibold mb-3 mt-6;
+  }
+  
+  .prose p {
+    @apply text-base md:text-lg leading-relaxed mb-4;
+  }
+  
+  /* Enhanced button styles */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 transform hover:scale-105 focus:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-all duration-200 transform hover:scale-105 focus:scale-105;
+  }
+  
+  /* Improved card styles */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+  
+  /* Better spacing utilities */
+  .section-padding {
+    @apply py-16 md:py-20 lg:py-24;
+  }
+  
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
   }
 }
