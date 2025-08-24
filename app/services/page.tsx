@@ -313,7 +313,7 @@ export default function ServicesPage() {
                 </div>
                 
                 <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center gap-3 mb-3">
                       <h3 className="text-2xl font-bold text-foreground">{service.title}</h3>
                       <Badge variant="secondary">{service.category}</Badge>
                     </div>

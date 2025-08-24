@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Plus, Edit, Trash2, ExternalLink, Github } from "lucide-react"
 import connectDB from "@/lib/mongodb"
-import Project from "@/models/Project"
+import { Project } from "@/lib/models"
 
 async function getAllProjects() {
   try {

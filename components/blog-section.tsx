@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { CalendarDays, Clock, ArrowRight } from "lucide-react"
 import connectDB from "@/lib/mongodb"
-import Post from "@/models/Post"
+import { Post } from "@/lib/models"
 
 async function getLatestPosts() {
   try {
