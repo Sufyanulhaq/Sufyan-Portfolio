@@ -4,31 +4,50 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CalendarDays, Clock, ArrowRight } from "lucide-react"
-import connectDB from "@/lib/mongodb"
-import type { IPost } from "@/models/Post"
+import { neon } from '@neondatabase/serverless'
 
-async function getLatestPosts(): Promise<Array<IPost & { _id: string; author: { _id: string; name: string }; createdAt: string; updatedAt: string }>> {
+async function getLatestPosts() {
   try {
-    await connectDB()
+    if (!process.env.DATABASE_URL) {
+      console.log("DATABASE_URL not configured, using fallback data")
+      return []
+    }
+
+    const sql = neon(process.env.DATABASE_URL)
     
-    // Dynamic import to avoid circular dependency issues
-    const { Post } = await import("@/lib/models")
-    
-    const posts = await Post.find({ published: true })
-      .populate("author", "name")
-      .sort({ createdAt: -1 })
-      .limit(3)
-      .lean()
+    const posts = await sql`
+      SELECT 
+        p.id,
+        p.title,
+        p.excerpt,
+        p.status,
+        p.view_count,
+        p.published_at,
+        p.created_at,
+        p.updated_at,
+        u.name as author_name,
+        u.id as author_id
+      FROM cms.posts p
+      LEFT JOIN cms.users u ON p.author_id = u.id
+      WHERE p.status = 'published'
+      ORDER BY p.published_at DESC
+      LIMIT 3
+    `
 
     return posts.map((post: any) => ({
-      ...post,
-      _id: post._id.toString(),
+      _id: post.id.toString(),
+      title: post.title,
+      excerpt: post.excerpt,
       author: {
-        ...post.author,
-        _id: post.author._id.toString(),
+        _id: post.author_id?.toString() || '1',
+        name: post.author_name || 'Admin User'
       },
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
+      createdAt: post.created_at?.toISOString() || new Date().toISOString(),
+      updatedAt: post.updated_at?.toISOString() || new Date().toISOString(),
+      category: 'Development',
+      featured: false,
+      readTime: '8',
+      slug: post.title.toLowerCase().replace(/\s+/g, '-')
     }))
   } catch (error) {
     console.error("Error fetching latest posts:", error)

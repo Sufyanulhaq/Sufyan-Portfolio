@@ -1,33 +1,47 @@
 import { NextRequest, NextResponse } from "next/server"
+import { neon } from '@neondatabase/serverless'
 
 // Force dynamic rendering to prevent build-time analysis
 export const dynamic = 'force-dynamic'
 
-// Dynamic imports to prevent build-time analysis
-const connectDB = () => import("@/lib/mongodb").then(m => m.default())
-const Category = () => import("@/models/Category").then(m => m.default)
-
 export async function GET(request: NextRequest) {
-  // Prevent build-time execution
-  if (process.env.NODE_ENV === 'production' && !process.env.MONGODB_URI) {
-    return NextResponse.json({ error: "Database not configured" }, { status: 500 })
-  }
-
   try {
-    // Only connect to DB if we're not in build mode
-    if (process.env.MONGODB_URI) {
-      await connectDB()
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 500 })
     }
 
-    const categories = await (await Category()).find({ isActive: true })
-      .sort({ name: 1 })
-      .lean()
+    const sql = neon(process.env.DATABASE_URL)
+    
+    const categories = await sql`
+      SELECT 
+        id,
+        name,
+        slug,
+        description,
+        parent_id,
+        sort_order,
+        is_active,
+        meta_title,
+        meta_description,
+        created_at,
+        updated_at
+      FROM cms.categories
+      WHERE is_active = TRUE
+      ORDER BY sort_order ASC, name ASC
+    `
 
     const formattedCategories = categories.map((category) => ({
-      ...category,
-      _id: category._id.toString(),
-      createdAt: category.createdAt.toISOString(),
-      updatedAt: category.updatedAt.toISOString(),
+      _id: category.id.toString(),
+      name: category.name,
+      slug: category.slug,
+      description: category.description,
+      parentId: category.parent_id,
+      sortOrder: category.sort_order,
+      isActive: category.is_active,
+      metaTitle: category.meta_title,
+      metaDescription: category.meta_description,
+      createdAt: category.created_at?.toISOString(),
+      updatedAt: category.updated_at?.toISOString(),
     }))
 
     return NextResponse.json({ categories: formattedCategories })
