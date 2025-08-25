@@ -15,7 +15,9 @@ import {
   Globe,
   Mail,
   TrendingUp,
-  Search
+  Search,
+  Home,
+  Image
 } from 'lucide-react'
 import Link from 'next/link'
 import { neon } from '@neondatabase/serverless'
