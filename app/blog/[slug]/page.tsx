@@ -5,14 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CalendarDays, Clock, Eye, Heart, ArrowLeft, Share2, Bookmark } from "lucide-react"
+import { neon } from '@neondatabase/serverless'
 
-// Force dynamic rendering to prevent build-time MongoDB connection
+// Force dynamic rendering to prevent build-time database connection
 export const dynamic = 'force-dynamic'
-
-// Dynamic imports to prevent build-time analysis
-const connectDB = () => import("@/lib/mongodb").then(m => m.default())
-const Post = () => import("@/models/Post").then(m => m.default)
-const Comment = () => import("@/models/Comment").then(m => m.default)
 
 interface BlogPostPageProps {
   params: {
@@ -20,228 +16,292 @@ interface BlogPostPageProps {
   }
 }
 
-async function getBlogPost(slug: string) {
+async function getPostBySlug(slug: string) {
   try {
-    
-    
-    const post = await (await Post()).findOne({ 
-      slug, 
-      published: true 
-    }).populate("author", "name email bio avatar")
-
-    if (!post) {
+    if (!process.env.DATABASE_URL) {
+      console.warn('Database not configured')
       return null
     }
 
-    // Increment view count
-    await (await Post()).findByIdAndUpdate(post._id, { $inc: { views: 1 } })
+    const sql = neon(process.env.DATABASE_URL)
+    
+    const posts = await sql`
+      SELECT 
+        p.id,
+        p.title,
+        p.slug,
+        p.excerpt,
+        p.content,
+        p.featured_image,
+        p.status,
+        p.published_at,
+        p.view_count,
+        p.tags,
+        p.created_at,
+        p.updated_at,
+        u.name as author_name,
+        u.email as author_email,
+        u.bio as author_bio,
+        u.avatar_url as author_avatar,
+        c.name as category_name
+      FROM cms.posts p
+      LEFT JOIN cms.users u ON p.author_id = u.id
+      LEFT JOIN cms.categories c ON p.category_id = c.id
+      WHERE p.slug = ${slug} AND p.status = 'published'
+      LIMIT 1
+    `
 
-    // Get comments for this post
-    const comments = await (await Comment()).find({ 
-      post: post._id, 
-      isApproved: true 
-    }).populate("author", "name").sort({ createdAt: -1 }).lean()
+    if (posts.length === 0) {
+      return null
+    }
+
+    const post = posts[0]
+
+    // Increment view count
+    await sql`
+      UPDATE cms.posts 
+      SET view_count = view_count + 1 
+      WHERE id = ${post.id}
+    `
 
     return {
-      ...post.toObject(),
-      _id: post._id.toString(),
-      author: post.author ? {
-        ...post.author,
-        _id: post.author._id.toString(),
-      } : null,
-      createdAt: post.createdAt.toISOString(),
-      updatedAt: post.updatedAt.toISOString(),
-      comments: comments.map(comment => ({
-        ...comment,
-        _id: comment._id.toString(),
-        author: comment.author ? {
-          ...comment.author,
-          _id: comment.author._id.toString(),
-        } : null,
-        createdAt: comment.createdAt.toISOString(),
-      }))
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      content: post.content,
+      featuredImage: post.featured_image,
+      status: post.status,
+      publishedAt: post.published_at?.toISOString(),
+      viewCount: post.view_count + 1, // Include the increment
+      tags: post.tags || [],
+      createdAt: post.created_at?.toISOString(),
+      updatedAt: post.updated_at?.toISOString(),
+      author: {
+        name: post.author_name || 'Unknown Author',
+        email: post.author_email,
+        bio: post.author_bio,
+        avatar: post.author_avatar
+      },
+      category: post.category_name || 'Uncategorized'
     }
   } catch (error) {
-    console.error("Error fetching blog post:", error)
+    console.error('Error fetching post:', error)
     return null
   }
 }
 
+async function getRelatedPosts(currentPostId: number, limit = 3) {
+  try {
+    if (!process.env.DATABASE_URL) {
+      return []
+    }
+
+    const sql = neon(process.env.DATABASE_URL)
+    
+    const posts = await sql`
+      SELECT 
+        p.id,
+        p.title,
+        p.slug,
+        p.excerpt,
+        p.featured_image,
+        p.published_at,
+        p.view_count,
+        u.name as author_name,
+        c.name as category_name
+      FROM cms.posts p
+      LEFT JOIN cms.users u ON p.author_id = u.id
+      LEFT JOIN cms.categories c ON p.category_id = c.id
+      WHERE p.id != ${currentPostId} 
+        AND p.status = 'published'
+      ORDER BY p.published_at DESC
+      LIMIT ${limit}
+    `
+
+    return posts.map(post => ({
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      featuredImage: post.featured_image,
+      publishedAt: post.published_at?.toISOString(),
+      viewCount: post.view_count || 0,
+      author: {
+        name: post.author_name || 'Unknown Author'
+      },
+      category: post.category_name || 'Uncategorized'
+    }))
+  } catch (error) {
+    console.error('Error fetching related posts:', error)
+    return []
+  }
+}
+
+function calculateReadTime(content: string): number {
+  const wordsPerMinute = 200
+  const words = content.split(/\s+/).length
+  return Math.ceil(words / wordsPerMinute)
+}
+
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = await getBlogPost(params.slug)
+  const post = await getPostBySlug(params.slug)
 
   if (!post) {
     notFound()
   }
 
+  const relatedPosts = await getRelatedPosts(post.id)
+  const readTime = calculateReadTime(post.content)
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-background border-b">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+      <header className="border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Button variant="ghost" asChild className="mb-4">
             <Link href="/blog">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Blog
             </Link>
           </Button>
-          
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <CalendarDays className="h-4 w-4" />
-              <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-            </div>
-            {post.readTime && (
-              <div className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
-                <span>{post.readTime} min read</span>
-              </div>
-            )}
-            <div className="flex items-center gap-1">
-              <Eye className="h-4 w-4" />
-              <span>{post.views?.toLocaleString() || 0} views</span>
-            </div>
-            {post.likes && (
-              <div className="flex items-center gap-1">
-                <Heart className="h-4 w-4" />
-                <span>{post.likes} likes</span>
-              </div>
-            )}
-          </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <article className="max-w-4xl mx-auto px-4 py-8">
-        {/* Post Header */}
-        <header className="mb-8">
-          <div className="space-y-4">
-            {post.featured && (
-              <Badge className="bg-accent text-accent-foreground">Featured Post</Badge>
-            )}
-            
-            <h1 className="font-heading text-4xl md:text-5xl font-bold leading-tight">
-              {post.title}
-            </h1>
-            
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              {post.excerpt}
-            </p>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Article Header */}
+        <article className="space-y-8">
+          <header className="space-y-6">
+            <div className="space-y-4">
+              <Badge>{post.category}</Badge>
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+                {post.title}
+              </h1>
+              {post.excerpt && (
+                <p className="text-xl text-muted-foreground leading-relaxed">
+                  {post.excerpt}
+                </p>
+              )}
+            </div>
+
+            {/* Meta Information */}
+            <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <CalendarDays className="h-4 w-4" />
+                {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : 'Unknown date'}
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                {readTime} min read
+              </div>
+              <div className="flex items-center gap-2">
+                <Eye className="h-4 w-4" />
+                {post.viewCount} views
+              </div>
+            </div>
 
             {/* Author Info */}
-            {post.author && (
-              <div className="flex items-center gap-4 pt-4 border-t">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-primary font-semibold text-lg">
-                      {post.author.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-medium">{post.author.name}</p>
-                    {post.author.bio && (
-                      <p className="text-sm text-muted-foreground">{post.author.bio}</p>
-                    )}
-                  </div>
-                </div>
+            <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+              <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
+                {post.author.name.charAt(0).toUpperCase()}
               </div>
-            )}
+              <div>
+                <p className="font-semibold">{post.author.name}</p>
+                {post.author.bio && (
+                  <p className="text-sm text-muted-foreground">{post.author.bio}</p>
+                )}
+              </div>
+            </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-3 pt-4">
+            {/* Actions */}
+            <div className="flex items-center gap-4">
               <Button variant="outline" size="sm">
-                <Share2 className="h-4 w-4 mr-2" />
+                <Heart className="mr-2 h-4 w-4" />
+                Like
+              </Button>
+              <Button variant="outline" size="sm">
+                <Share2 className="mr-2 h-4 w-4" />
                 Share
               </Button>
               <Button variant="outline" size="sm">
-                <Bookmark className="h-4 w-4 mr-2" />
-                Bookmark
+                <Bookmark className="mr-2 h-4 w-4" />
+                Save
               </Button>
             </div>
-          </div>
-        </header>
+          </header>
 
-        {/* Cover Image */}
-        {post.coverImage && (
-          <div className="relative aspect-video mb-8 rounded-lg overflow-hidden">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-        )}
-
-        {/* Post Content */}
-        <div className="prose prose-lg max-w-none mb-12">
-          <div dangerouslySetInnerHTML={{ __html: post.content }} />
-        </div>
-
-        {/* Tags */}
-        {post.tags && post.tags.length > 0 && (
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3">Tags</h3>
-            <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <Badge key={tag} variant="outline">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Comments Section */}
-        <div className="border-t pt-8">
-          <h3 className="text-2xl font-bold mb-6">
-            Comments ({post.comments?.length || 0})
-          </h3>
-          
-          {post.comments && post.comments.length > 0 ? (
-            <div className="space-y-6">
-              {post.comments.map((comment) => (
-                <Card key={comment._id}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-primary font-semibold text-sm">
-                          {comment.author?.name?.charAt(0).toUpperCase() || "U"}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">
-                          {comment.author?.name || "Anonymous"}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(comment.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm">{comment.content}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No comments yet. Be the first to share your thoughts!</p>
+          {/* Featured Image */}
+          {post.featuredImage && (
+            <div className="relative aspect-video rounded-xl overflow-hidden">
+              <Image
+                src={post.featuredImage}
+                alt={post.title}
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
           )}
 
-          {/* Comment Form Placeholder */}
-          <div className="mt-8 p-6 border rounded-lg bg-muted/30">
-            <p className="text-center text-muted-foreground">
-              Comment functionality coming soon! Users will be able to leave comments on blog posts.
-            </p>
+          {/* Article Content */}
+          <div className="prose prose-lg max-w-none">
+            <div dangerouslySetInnerHTML={{ __html: post.content }} />
           </div>
-        </div>
-      </article>
+
+          {/* Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="font-semibold">Tags</h3>
+              <div className="flex flex-wrap gap-2">
+                {post.tags.map((tag: string) => (
+                  <Badge key={tag} variant="secondary">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </article>
+
+        {/* Related Posts */}
+        {relatedPosts.length > 0 && (
+          <section className="mt-16 space-y-8">
+            <h2 className="text-3xl font-bold">Related Posts</h2>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {relatedPosts.map((relatedPost) => (
+                <Card key={relatedPost.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <Link href={`/blog/${relatedPost.slug}`}>
+                    {relatedPost.featuredImage && (
+                      <div className="relative aspect-video">
+                        <Image
+                          src={relatedPost.featuredImage}
+                          alt={relatedPost.title}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <CardHeader>
+                      <CardTitle className="line-clamp-2">{relatedPost.title}</CardTitle>
+                      <CardDescription className="line-clamp-3">
+                        {relatedPost.excerpt}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span>{relatedPost.author.name}</span>
+                        <span>•</span>
+                        <span>{relatedPost.publishedAt ? new Date(relatedPost.publishedAt).toLocaleDateString() : 'Unknown date'}</span>
+                      </div>
+                    </CardContent>
+                  </Link>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
     </div>
   )
 }
-
-// Removed generateStaticParams since we're using force-dynamic

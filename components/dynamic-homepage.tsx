@@ -240,11 +240,13 @@ export default async function DynamicHomepage() {
     <div className="min-h-screen bg-background">
       {sections.map(renderSection)}
       
-      {/* Custom CSS */}
+      {/* Custom CSS - Using dangerouslySetInnerHTML instead of styled-jsx */}
       {sections.some(s => s.custom_css) && (
-        <style jsx>{`
-          ${sections.filter(s => s.custom_css).map(s => s.custom_css).join('\n')}
-        `}</style>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `<style>${sections.filter(s => s.custom_css).map(s => s.custom_css).join('\n')}</style>`
+          }}
+        />
       )}
     </div>
   )
