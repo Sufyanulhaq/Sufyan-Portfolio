@@ -103,27 +103,34 @@ export default function NewPostPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b bg-card">
-        <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-4">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/admin/posts">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Posts
-              </Link>
-            </Button>
-            <h1 className="text-2xl font-bold">Create New Blog Post</h1>
-          </div>
-          <div className="ml-auto flex items-center space-x-4">
-            <Button variant="outline" size="sm" onClick={handlePreview}>
-              <Eye className="mr-2 h-4 w-4" />
-              {isPreview ? 'Edit' : 'Preview'}
-            </Button>
-            <Button onClick={handleSubmit} disabled={isLoading}>
-              <Save className="mr-2 h-4 w-4" />
-              {isLoading ? 'Saving...' : 'Save Post'}
-            </Button>
+      {/* Page Header */}
+      <div className="border-b bg-white">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/admin/posts">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Posts
+                </Link>
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Create New Blog Post</h1>
+                <p className="text-sm text-gray-600 mt-1">
+                  Write and publish a new blog post for your website.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button variant="outline" size="sm" onClick={handlePreview}>
+                <Eye className="mr-2 h-4 w-4" />
+                {isPreview ? 'Edit' : 'Preview'}
+              </Button>
+              <Button onClick={handleSubmit} disabled={isLoading}>
+                <Save className="mr-2 h-4 w-4" />
+                {isLoading ? 'Saving...' : 'Save Post'}
+              </Button>
+            </div>
           </div>
         </div>
       </div>

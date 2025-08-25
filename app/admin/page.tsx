@@ -61,25 +61,27 @@ export default async function AdminPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b bg-card">
-        <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold">Advanced CMS Dashboard</h1>
-            <span className="text-sm text-muted-foreground">
-              Welcome back, {session.name} ({session.role})
-            </span>
-          </div>
-          <div className="ml-auto flex items-center space-x-4">
-            <span className="text-xs text-muted-foreground">
-              Last login: {session.last_login ? new Date(session.last_login).toLocaleDateString() : 'Never'}
-            </span>
-            <form action={logoutAction}>
-              <Button variant="outline" size="sm">
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
-            </form>
+      {/* Page Header */}
+      <div className="border-b bg-white">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Welcome back, {session.name}! Here's what's happening with your site.
+              </p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-xs text-gray-500">
+                Last login: {session.last_login ? new Date(session.last_login).toLocaleDateString() : 'Never'}
+              </span>
+              <form action={logoutAction}>
+                <Button variant="outline" size="sm">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
