@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import connectDB from "@/lib/mongodb"
+import { neon } from "@neondatabase/serverless"
 import Post from "@/models/Post"
 import User from "@/models/User"
 import Project from "@/models/Project"
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    await connectDB()
+    
 
     // Calculate date ranges
     const now = new Date()

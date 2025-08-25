@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import connectDB from "@/lib/mongodb"
+import { neon } from "@neondatabase/serverless"
 import User from "@/models/User"
 
 export async function PATCH(
@@ -28,7 +28,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid user ID" }, { status: 400 })
     }
 
-    await connectDB()
+    
 
     // Check if user exists
     const existingUser = await User.findById(id)
@@ -107,7 +107,7 @@ export async function DELETE(
       )
     }
 
-    await connectDB()
+    
 
     // Check if user exists
     const existingUser = await User.findById(id)

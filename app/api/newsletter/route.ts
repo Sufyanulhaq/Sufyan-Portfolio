@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import connectDB from "@/lib/mongodb"
+import { neon } from "@neondatabase/serverless"
 import Newsletter from "@/models/Newsletter"
 import { sendNewsletterWelcome } from "@/lib/email"
 
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    await connectDB()
+    
 
     // Check if email already exists
     const existingSubscription = await Newsletter.findOne({ email: email.toLowerCase() })
@@ -108,7 +108,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    await connectDB()
+    
 
     const subscription = await Newsletter.findOne({ email: email.toLowerCase() })
     
@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    await connectDB()
+    
 
     const subscriptions = await Newsletter.find({})
       .sort({ subscribedAt: -1 })

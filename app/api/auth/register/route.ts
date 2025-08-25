@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
-import connectDB from "@/lib/mongodb"
+import { neon } from "@neondatabase/serverless"
 import User from "@/models/User"
 
 export async function POST(request: NextRequest) {
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    await connectDB()
+    
 
     // Check if user already exists
     const existingUser = await User.findOne({ email })

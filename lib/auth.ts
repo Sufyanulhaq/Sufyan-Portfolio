@@ -61,7 +61,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          await connectDB()
+          
           const user = await User.findOne({ email: credentials.email })
 
           if (!user || !user.isActive) {
@@ -136,7 +136,7 @@ export const authOptions: NextAuthOptions = {
     async signOut({ token }) {
       if (token?.sub) {
         try {
-          await connectDB()
+          
           await UserActivity.create({
             user: token.sub,
             action: "LOGOUT",

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import connectDB from "@/lib/mongodb"
+import { neon } from '@neondatabase/serverless'
 import Project from "@/models/Project"
 
 export async function GET(
@@ -26,7 +26,7 @@ export async function GET(
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
-    await connectDB()
+    
 
     const project = await Project.findById(id)
 
@@ -74,7 +74,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
-    await connectDB()
+    
 
     // Check if project exists
     const existingProject = await Project.findById(id)
@@ -133,7 +133,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
     }
 
-    await connectDB()
+    
 
     // Check if project exists
     const existingProject = await Project.findById(id)

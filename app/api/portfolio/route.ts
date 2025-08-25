@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import connectDB from "@/lib/mongodb"
+import { neon } from "@neondatabase/serverless"
 import Project from "@/models/Project"
 
 export async function GET(request: NextRequest) {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const featured = searchParams.get("featured") || "all"
     const search = searchParams.get("search") || ""
     
-    await connectDB()
+    
 
     // Build query
     const query: any = {}

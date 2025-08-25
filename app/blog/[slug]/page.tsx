@@ -22,7 +22,7 @@ interface BlogPostPageProps {
 
 async function getBlogPost(slug: string) {
   try {
-    await connectDB()
+    
     
     const post = await (await Post()).findOne({ 
       slug, 

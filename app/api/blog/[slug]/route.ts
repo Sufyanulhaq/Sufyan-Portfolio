@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import connectDB from "@/lib/mongodb"
+import { neon } from "@neondatabase/serverless"
 import Post from "@/models/Post"
 
 export async function GET(
@@ -13,7 +13,7 @@ export async function GET(
       return NextResponse.json({ error: "Slug is required" }, { status: 400 })
     }
 
-    await connectDB()
+    
 
     const post = await Post.findOne({ 
       slug, 
