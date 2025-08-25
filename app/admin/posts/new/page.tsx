@@ -19,9 +19,11 @@ import {
   Calendar,
   Clock,
   Tag,
-  FileText
+  FileText,
+  Image
 } from 'lucide-react'
 import Link from 'next/link'
+import { ImageUpload } from '@/components/ui/image-upload'
 
 export default function NewPostPage() {
   const router = useRouter()
@@ -187,6 +189,30 @@ export default function NewPostPage() {
             </CardContent>
           </Card>
 
+          {/* Media & Images */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Image className="h-5 w-5" />
+                Media & Images
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Featured Image</Label>
+                <p className="text-sm text-muted-foreground">
+                  Upload a featured image for your post. This will be displayed as the main image.
+                </p>
+                <ImageUpload
+                  value={formData.featuredImage}
+                  onChange={(url) => setFormData(prev => ({ ...prev, featuredImage: url }))}
+                  onRemove={() => setFormData(prev => ({ ...prev, featuredImage: '' }))}
+                  disabled={isLoading}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Categories & Tags */}
           <Card>
             <CardHeader>
@@ -269,30 +295,18 @@ export default function NewPostPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="published">Published</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="featuredImage">Featured Image URL</Label>
-                  <Input
-                    id="featuredImage"
-                    value={formData.featuredImage}
-                    onChange={(e) => setFormData(prev => ({ ...prev, featuredImage: e.target.value }))}
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex items-center space-x-2">
