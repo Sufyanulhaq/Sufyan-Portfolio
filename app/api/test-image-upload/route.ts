@@ -33,9 +33,21 @@ export async function POST(request: NextRequest) {
     const fileExtension = file.name.split('.').pop()
     const filename = `${timestamp}-${Math.random().toString(36).substring(2)}.${fileExtension}`
     
-    // For testing, return a unique placeholder URL
+    // For testing, return a truly unique placeholder URL
     const uniqueId = Math.random().toString(36).substring(2, 15)
-    const testUrl = `https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=600&fit=crop&crop=center&auto=format&q=80&id=${uniqueId}&filename=${encodeURIComponent(file.name)}&timestamp=${timestamp}`
+    const randomSeed = Math.floor(Math.random() * 1000000)
+    
+    // Use different Unsplash images for variety
+    const imageIds = [
+      '1555066931-4365d14bab8c', // Original
+      '1555066932-4365d14bab8d', // Different
+      '1555066933-4365d14bab8e', // Different
+      '1555066934-4365d14bab8f', // Different
+      '1555066935-4365d14bab9a'  // Different
+    ]
+    
+    const randomImageId = imageIds[randomSeed % imageIds.length]
+    const testUrl = `https://images.unsplash.com/photo-${randomImageId}?w=800&h=600&fit=crop&crop=center&auto=format&q=80&id=${uniqueId}&filename=${encodeURIComponent(file.name)}&timestamp=${timestamp}&seed=${randomSeed}`
 
     return NextResponse.json({
       success: true,

@@ -17,6 +17,7 @@ export async function POST(request: Request) {
       excerpt,
       content,
       category,
+      categoryId,
       tags,
       status,
       featured,
@@ -34,6 +35,24 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
+    
+    // Debug logging to see what's being received
+    console.log('Received post data:', {
+      title,
+      slug,
+      excerpt,
+      content,
+      category,
+      categoryId,
+      tags,
+      status,
+      featured,
+      readTime,
+      featuredImage,
+      seoTitle,
+      seoDescription,
+      seoKeywords
+    })
 
     const sql = neon(process.env.DATABASE_URL!)
 
@@ -60,8 +79,8 @@ export async function POST(request: Request) {
       og_description: seoDescription || excerpt
     }
 
-    // Convert category to integer if provided
-    const categoryId = category ? parseInt(category.toString()) : null
+    // Convert category to integer if provided (handle both category and categoryId)
+    const finalCategoryId = (categoryId || category) ? parseInt((categoryId || category).toString()) : null
     
     // Debug logging
     console.log('Post creation data:', {
@@ -69,6 +88,7 @@ export async function POST(request: Request) {
       slug,
       category: category,
       categoryId: categoryId,
+      finalCategoryId: finalCategoryId,
       categoryType: typeof category,
       categoryIdType: typeof categoryId
     })
@@ -80,7 +100,7 @@ export async function POST(request: Request) {
         featured, featured_image, author_id, published_at
       ) VALUES (
         ${title}, ${slug}, ${excerpt || null}, ${content}, 
-        ${categoryId}, ${tags || []}, ${status || 'draft'}, 
+        ${finalCategoryId}, ${tags || []}, ${status || 'draft'}, 
         ${featured || false}, ${featuredImage || null}, ${session.id}, 
         ${status === 'published' ? new Date().toISOString() : null}
       ) RETURNING id
