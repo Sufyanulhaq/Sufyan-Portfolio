@@ -1,27 +1,32 @@
 import { getSession } from '@/lib/auth-actions'
 import { redirect } from 'next/navigation'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { 
-  Settings, 
   Plus, 
   Edit, 
   Trash2, 
-  Eye,
-  Calendar,
-  TrendingUp,
+  Eye, 
+  Settings,
   DollarSign,
-  Clock,
   Star,
-  Image as ImageIcon
+  Calendar
 } from 'lucide-react'
 import Link from 'next/link'
 import { neon } from '@neondatabase/serverless'
 
+// Force dynamic rendering to prevent build-time database connection
+export const dynamic = 'force-dynamic'
+
 async function getServices() {
   try {
-    const sql = neon(process.env.DATABASE_URL!)
+    if (!process.env.DATABASE_URL) {
+      console.warn('Database not configured')
+      return []
+    }
+
+    const sql = neon(process.env.DATABASE_URL)
     
     const services = await sql`
       SELECT 
@@ -43,7 +48,22 @@ async function getServices() {
       ORDER BY s.sort_order ASC, s.created_at DESC
     `
     
-    return services
+    return services.map(service => ({
+      id: service.id,
+      title: service.title,
+      slug: service.slug,
+      description: service.description,
+      content: service.content,
+      status: service.status,
+      featured: service.featured,
+      icon: service.icon,
+      featuredImage: service.featured_image,
+      priceRange: service.price_range,
+      features: service.features || [],
+      sortOrder: service.sort_order,
+      createdAt: service.created_at?.toISOString(),
+      updatedAt: service.updated_at?.toISOString()
+    }))
   } catch (error) {
     console.error('Error fetching services:', error)
     return []
@@ -59,31 +79,8 @@ export default async function ServicesPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-100 text-green-800'
-      case 'inactive': return 'bg-gray-100 text-gray-800'
-      case 'coming_soon': return 'bg-blue-100 text-blue-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  const getCategoryColor = (category: string) => {
-    const colors: { [key: string]: string } = {
-      'Web Development': 'bg-blue-100 text-blue-800',
-      'Mobile Development': 'bg-purple-100 text-purple-800',
-      'UI/UX Design': 'bg-pink-100 text-pink-800',
-      'E-commerce': 'bg-green-100 text-green-800',
-      'API Development': 'bg-orange-100 text-orange-800',
-      'Consulting': 'bg-indigo-100 text-indigo-800',
-      'Maintenance': 'bg-yellow-100 text-yellow-800'
-    }
-    return colors[category] || 'bg-gray-100 text-gray-800'
-  }
-
-  const getPriceRangeColor = (priceRange: string) => {
-    switch (priceRange) {
-      case 'Budget': return 'bg-green-100 text-green-800'
-      case 'Mid-Range': return 'bg-yellow-100 text-yellow-800'
-      case 'Premium': return 'bg-purple-100 text-purple-800'
-      case 'Enterprise': return 'bg-blue-100 text-blue-800'
+      case 'inactive': return 'bg-yellow-100 text-yellow-800'
+      case 'archived': return 'bg-gray-100 text-gray-800'
       default: return 'bg-gray-100 text-gray-800'
     }
   }
@@ -104,7 +101,7 @@ export default async function ServicesPage() {
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold">Services Management</h1>
             <span className="text-sm text-muted-foreground">
-              Manage your professional services and offerings
+              Manage your service offerings and pricing
             </span>
           </div>
           <div className="ml-auto flex items-center space-x-4">
@@ -160,171 +157,105 @@ export default async function ServicesPage() {
                 {services.filter(s => s.featured).length}
               </div>
               <p className="text-xs text-muted-foreground">
-                Highlighted services
+                Featured services
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Inactive</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Price Range</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {services.filter(s => s.status === 'inactive').length}
+                {services.filter(s => s.priceRange).length}
               </div>
               <p className="text-xs text-muted-foreground">
-                Draft/Inactive services
+                With pricing
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Services Grid */}
+        {/* Services List */}
         <Card>
           <CardHeader>
             <CardTitle>All Services</CardTitle>
           </CardHeader>
           <CardContent>
-            {services.length === 0 ? (
-              <div className="text-center py-12">
-                <Settings className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-lg font-medium">No services yet</h3>
-                <p className="mt-2 text-muted-foreground">
-                  Get started by adding your first service offering.
+            {services.length > 0 ? (
+              <div className="space-y-4">
+                {services.map((service) => (
+                  <div key={service.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-semibold text-lg">{service.title}</h3>
+                        <Badge className={getStatusColor(service.status)}>
+                          {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
+                        </Badge>
+                        {service.featured && (
+                          <Badge variant="secondary">Featured</Badge>
+                        )}
+                      </div>
+                      
+                      {service.description && (
+                        <p className="text-muted-foreground text-sm line-clamp-2">
+                          {service.description}
+                        </p>
+                      )}
+                      
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          <span>{formatDate(service.createdAt)}</span>
+                        </div>
+                        {service.priceRange && (
+                          <div className="flex items-center gap-1">
+                            <DollarSign className="h-3 w-3" />
+                            <span>{service.priceRange}</span>
+                          </div>
+                        )}
+                        {service.features && service.features.length > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Settings className="h-3 w-3" />
+                            <span>{service.features.length} features</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 ml-4">
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/services/${service.id}/edit`}>
+                          <Edit className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/services/${service.slug}`} target="_blank">
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Settings className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No services found</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Create your first service to get started
                 </p>
                 <Button asChild className="mt-4">
                   <Link href="/admin/services/new">
                     <Plus className="mr-2 h-4 w-4" />
-                    Add First Service
+                    Create Service
                   </Link>
                 </Button>
-              </div>
-            ) : (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {services.map((service) => (
-                  <div key={service.id} className="group border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300">
-                    {/* Service Image */}
-                    <div className="relative aspect-video bg-muted overflow-hidden">
-                      {service.featured_image ? (
-                        <img
-                          src={service.featured_image}
-                          alt={service.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <ImageIcon className="h-12 w-12 text-muted-foreground" />
-                        </div>
-                      )}
-                      
-                      {/* Status Badge */}
-                      <div className="absolute top-3 left-3">
-                        <Badge className={getStatusColor(service.status)}>
-                          {service.status === 'active' ? 'Active' : 
-                           service.status === 'inactive' ? 'Inactive' : 
-                           service.status === 'coming_soon' ? 'Coming Soon' : service.status}
-                        </Badge>
-                      </div>
-                      
-                      {/* Featured Badge */}
-                      {service.featured && (
-                        <div className="absolute top-3 right-3">
-                          <Badge variant="secondary">Featured</Badge>
-                        </div>
-                      )}
-
-                      {/* Sort Order */}
-                      {service.sort_order && (
-                        <div className="absolute bottom-3 left-3">
-                          <Badge variant="outline" className="bg-background/80">
-                            #{service.sort_order}
-                          </Badge>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Service Info */}
-                    <div className="p-4 space-y-3">
-                      <div className="space-y-2">
-                        <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-primary transition-colors">
-                          {service.title}
-                        </h3>
-                        
-                        {service.description && (
-                          <p className="text-muted-foreground text-sm line-clamp-2">
-                            {service.description}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Price Range */}
-                      <div className="flex items-center gap-2">
-                        {service.price_range && (
-                          <Badge className={getPriceRangeColor(service.price_range)} variant="outline">
-                            {service.price_range}
-                          </Badge>
-                        )}
-                      </div>
-
-                      {/* Features */}
-                      {service.features && service.features.length > 0 && (
-                        <div className="space-y-1">
-                          <p className="text-xs font-medium text-muted-foreground">Key Features:</p>
-                          <div className="flex flex-wrap gap-1">
-                            {service.features.slice(0, 3).map((feature: string, index: number) => (
-                              <Badge key={index} variant="outline" className="text-xs">
-                                {feature}
-                              </Badge>
-                            ))}
-                            {service.features.length > 3 && (
-                              <span className="text-xs text-muted-foreground">
-                                +{service.features.length - 3} more
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Service Details */}
-                      <div className="space-y-2 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>Created: {formatDate(service.created_at)}</span>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex items-center gap-2 pt-2">
-                        <Button asChild variant="outline" size="sm" className="flex-1">
-                          <Link href={`/admin/services/${service.id}/edit`}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </Link>
-                        </Button>
-                        
-                        <Button asChild variant="outline" size="sm" className="flex-1">
-                          <Link href={`/services/${service.slug}`} target="_blank">
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
-                          </Link>
-                        </Button>
-                        
-                        <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      {/* Last Updated */}
-                      {service.updated_at && (
-                        <div className="text-xs text-muted-foreground pt-2 border-t">
-                          Updated: {formatDate(service.updated_at)}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
               </div>
             )}
           </CardContent>

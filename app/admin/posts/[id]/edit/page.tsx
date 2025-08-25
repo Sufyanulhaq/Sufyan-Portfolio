@@ -31,11 +31,11 @@ export default function EditPostPage({ params }: EditPostPageProps) {
     slug: "",
     excerpt: "",
     content: "",
-    category: "",
-    tags: "",
-    published: false,
+    categoryId: "",
+    tags: [],
+    status: "draft",
     featured: false,
-    image: "",
+    featuredImage: "",
   })
 
   useEffect(() => {
@@ -44,18 +44,21 @@ export default function EditPostPage({ params }: EditPostPageProps) {
       try {
         const response = await fetch(`/api/admin/posts/${params.id}`)
         if (response.ok) {
-          const post = await response.json()
+                  const data = await response.json()
+        if (data.success && data.post) {
+          const post = data.post
           setFormData({
-            title: post.title,
-            slug: post.slug,
-            excerpt: post.excerpt,
-            content: post.content,
-            category: post.category,
-            tags: post.tags.join(", "),
-            published: post.published,
-            featured: post.featured,
-            image: post.image || "",
+            title: post.title || "",
+            slug: post.slug || "",
+            excerpt: post.excerpt || "",
+            content: post.content || "",
+            categoryId: post.categoryId?.toString() || "",
+            tags: post.tags || [],
+            status: post.status || "draft",
+            featured: post.featured || false,
+            featuredImage: post.featuredImage || "",
           })
+        }
         }
       } catch (error) {
         console.error("Error fetching post:", error)
@@ -77,10 +80,7 @@ export default function EditPostPage({ params }: EditPostPageProps) {
         },
         body: JSON.stringify({
           ...formData,
-          tags: formData.tags
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter(Boolean),
+          tags: Array.isArray(formData.tags) ? formData.tags : formData.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
         }),
       })
 

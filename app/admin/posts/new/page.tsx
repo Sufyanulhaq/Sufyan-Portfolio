@@ -48,6 +48,7 @@ export default function NewPostPage() {
     featured: false,
     readTime: '',
     featuredImage: '',
+    imageUrl: '',
     seoTitle: '',
     seoDescription: '',
     seoKeywords: ''
@@ -117,10 +118,16 @@ export default function NewPostPage() {
     setIsLoading(true)
 
     try {
+      // Determine which image source to use
+      const imageData = {
+        ...formData,
+        featuredImage: formData.featuredImage || formData.imageUrl || ''
+      }
+      
       const response = await fetch('/api/admin/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(imageData)
       })
 
       if (response.ok) {
@@ -240,17 +247,53 @@ export default function NewPostPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Featured Image</Label>
-                <p className="text-sm text-muted-foreground">
-                  Upload a featured image for your post. This will be displayed as the main image.
-                </p>
-                <ImageUpload
-                  value={formData.featuredImage}
-                  onChange={(url) => setFormData(prev => ({ ...prev, featuredImage: url }))}
-                  onRemove={() => setFormData(prev => ({ ...prev, featuredImage: '' }))}
-                  disabled={isLoading}
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Featured Image</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Upload a featured image or provide an image URL for your post.
+                  </p>
+                  
+                  {/* Image Upload Option */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Option 1: Upload Image</Label>
+                    <ImageUpload
+                      value={formData.featuredImage}
+                      onChange={(url) => setFormData(prev => ({ ...prev, featuredImage: url }))}
+                      onRemove={() => setFormData(prev => ({ ...prev, featuredImage: '' }))}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  
+                  {/* Image URL Option */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Option 2: Image URL</Label>
+                    <Input
+                      type="url"
+                      placeholder="https://example.com/image.jpg"
+                      value={formData.imageUrl}
+                      onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                      disabled={isLoading}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Or provide a direct URL to an image
+                    </p>
+                  </div>
+                  
+                  {/* Current Image Display */}
+                  {(formData.featuredImage || formData.imageUrl) && (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Current Image</Label>
+                      <div className="relative aspect-video rounded-lg overflow-hidden border">
+                        <img
+                          src={formData.featuredImage || formData.imageUrl}
+                          alt="Featured image preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
