@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
     let paramIndex = 1
 
     if (category !== "all") {
-      whereConditions += ` AND p.category = $${paramIndex}`
-      queryParams.push(category)
+      whereConditions += ` AND p.category_id = $${paramIndex}`
+      queryParams.push(parseInt(category))
       paramIndex++
     }
     
@@ -45,12 +45,13 @@ export async function GET(request: NextRequest) {
     
     const postsQuery = `
       SELECT 
-        p.id, p.title, p.slug, p.excerpt, p.content, p.category, p.tags,
-        p.featured, p.status, p.read_time, p.views_count, p.likes_count,
+        p.id, p.title, p.slug, p.excerpt, p.content, p.category_id, p.tags,
+        p.featured, p.status, p.view_count, p.featured_image,
         p.created_at, p.updated_at, p.published_at,
-        u.name as author_name
+        u.name as author_name, c.name as category_name
       FROM cms.posts p
       LEFT JOIN cms.users u ON p.author_id = u.id
+      LEFT JOIN cms.categories c ON p.category_id = c.id
       ${whereConditions}
       ORDER BY p.created_at DESC
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
