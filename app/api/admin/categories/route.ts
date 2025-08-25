@@ -1,95 +1,121 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import connectDB from "@/lib/mongodb"
-import Category from "@/models/Category"
+import { NextResponse } from 'next/server'
+import { neon } from '@neondatabase/serverless'
+import { getSession } from '@/lib/auth-actions'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Check authentication
+    const session = await getSession()
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if user has permission to view categories
-    if (!["SUPER_ADMIN", "ADMIN", "EDITOR", "VIEWER"].includes(session.user.role)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 })
     }
 
-    await connectDB()
+    const sql = neon(process.env.DATABASE_URL)
 
-    const categories = await Category.find({ isActive: true })
-      .sort({ name: 1 })
-      .lean()
+    // Get all active categories
+    const categories = await sql`
+      SELECT 
+        id,
+        name,
+        slug,
+        description,
+        parent_id,
+        sort_order,
+        is_active,
+        created_at,
+        updated_at
+      FROM cms.categories
+      WHERE is_active = TRUE
+      ORDER BY sort_order ASC, name ASC
+    `
 
-    const formattedCategories = categories.map((category) => ({
-      ...category,
-      _id: category._id.toString(),
-      createdAt: category.createdAt.toISOString(),
-      updatedAt: category.updatedAt.toISOString(),
-    }))
+    return NextResponse.json({
+      success: true,
+      categories: categories.map(category => ({
+        ...category,
+        created_at: category.created_at?.toISOString(),
+        updated_at: category.updated_at?.toISOString()
+      }))
+    })
 
-    return NextResponse.json({ categories: formattedCategories })
   } catch (error) {
-    console.error("Error fetching categories:", error)
+    console.error('Error fetching categories:', error)
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Failed to fetch categories' },
       { status: 500 }
     )
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    // Check if user has permission to create categories
-    if (!["SUPER_ADMIN", "ADMIN"].includes(session.user.role)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    // Check authentication
+    const session = await getSession()
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
-    
-    await connectDB()
+    const { name, slug, description, parent_id, sort_order } = body
 
-    // Generate slug from name
-    const slug = body.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "")
-
-    // Check if slug already exists
-    const existingCategory = await Category.findOne({ slug })
-    if (existingCategory) {
-      return NextResponse.json({ error: "Category with this name already exists" }, { status: 400 })
+    if (!name || !slug) {
+      return NextResponse.json(
+        { error: 'Name and slug are required' },
+        { status: 400 }
+      )
     }
 
-    // Create new category
-    const category = new Category({
-      ...body,
-      slug,
-    })
+    const sql = neon(process.env.DATABASE_URL!)
 
-    await category.save()
+    // Check if slug already exists
+    const existingCategory = await sql`
+      SELECT id FROM cms.categories WHERE slug = ${slug} LIMIT 1
+    `
+
+    if (existingCategory.length > 0) {
+      return NextResponse.json(
+        { error: 'A category with this slug already exists' },
+        { status: 400 }
+      )
+    }
+
+    // Insert new category
+    const result = await sql`
+      INSERT INTO cms.categories (
+        name, slug, description, parent_id, sort_order, is_active
+      ) VALUES (
+        ${name}, ${slug}, ${description || null}, ${parent_id || null}, 
+        ${sort_order || 0}, TRUE
+      ) RETURNING id
+    `
+
+    const categoryId = result[0].id
+
+    // Log the activity
+    await sql`
+      INSERT INTO cms.activity_logs (
+        user_id, action, table_name, record_id, new_values
+      ) VALUES (
+        ${session.id}, 'create', 'categories', ${categoryId}, ${JSON.stringify({
+          name, slug, created_by: session.name
+        })}
+      )
+    `
 
     return NextResponse.json({
-      message: "Category created successfully",
-      category: {
-        ...category.toObject(),
-        _id: category._id.toString(),
-        createdAt: category.createdAt.toISOString(),
-        updatedAt: category.updatedAt.toISOString(),
-      },
+      success: true,
+      message: 'Category created successfully',
+      category: { id: categoryId, name, slug }
     })
+
   } catch (error) {
-    console.error("Error creating category:", error)
+    console.error('Error creating category:', error)
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Failed to create category' },
       { status: 500 }
     )
   }

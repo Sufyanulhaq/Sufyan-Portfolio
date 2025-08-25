@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,16 +25,24 @@ import {
 import Link from 'next/link'
 import { ImageUpload } from '@/components/ui/image-upload'
 
+interface Category {
+  id: number
+  name: string
+  slug: string
+  description?: string
+}
+
 export default function NewPostPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isPreview, setIsPreview] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
     excerpt: '',
     content: '',
-    category: '',
+    category: '', // This will store category ID as string
     tags: [] as string[],
     status: 'draft',
     featured: false,
@@ -76,6 +84,22 @@ export default function NewPostPage() {
   const handlePreview = () => {
     setIsPreview(!isPreview)
   }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/admin/categories')
+      if (response.ok) {
+        const data = await response.json()
+        setCategories(data.categories || [])
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -237,14 +261,18 @@ export default function NewPostPage() {
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Development">Development</SelectItem>
-                      <SelectItem value="Technology">Technology</SelectItem>
-                      <SelectItem value="Design">Design</SelectItem>
-                      <SelectItem value="Business">Business</SelectItem>
-                      <SelectItem value="Tutorial">Tutorial</SelectItem>
-                      <SelectItem value="News">News</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id.toString()}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
+                  {categories.length === 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      No categories found. You may need to create some categories first.
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">

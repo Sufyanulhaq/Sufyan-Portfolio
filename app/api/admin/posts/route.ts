@@ -60,6 +60,19 @@ export async function POST(request: Request) {
       og_description: seoDescription || excerpt
     }
 
+    // Convert category to integer if provided
+    const categoryId = category ? parseInt(category.toString()) : null
+    
+    // Debug logging
+    console.log('Post creation data:', {
+      title,
+      slug,
+      category: category,
+      categoryId: categoryId,
+      categoryType: typeof category,
+      categoryIdType: typeof categoryId
+    })
+
     // Insert the post
     const result = await sql`
       INSERT INTO cms.posts (
@@ -67,7 +80,7 @@ export async function POST(request: Request) {
         featured, featured_image, author_id, published_at
       ) VALUES (
         ${title}, ${slug}, ${excerpt || null}, ${content}, 
-        ${category || null}, ${tags || []}, ${status || 'draft'}, 
+        ${categoryId}, ${tags || []}, ${status || 'draft'}, 
         ${featured || false}, ${featuredImage || null}, ${session.id}, 
         ${status === 'published' ? new Date().toISOString() : null}
       ) RETURNING id
