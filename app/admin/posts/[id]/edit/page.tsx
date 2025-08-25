@@ -245,6 +245,35 @@ export default function EditPostPage({ params }: EditPostPageProps) {
                     placeholder="https://example.com/image.jpg"
                   />
                 </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value) => setFormData((prev) => ({ ...prev, status: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="published">Published</SelectItem>
+                      <SelectItem value="archived">Archived</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="featured">Featured Post</Label>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="featured"
+                      checked={formData.featured}
+                      onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, featured: checked }))}
+                    />
+                    <Label htmlFor="featured">Mark as featured</Label>
+                  </div>
+                </div>
 
                 <div className="flex items-center justify-between">
                   <Label htmlFor="published">Published</Label>

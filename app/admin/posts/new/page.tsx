@@ -223,6 +223,44 @@ export default function NewPostPage() {
                   rows={3}
                 />
               </div>
+              
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="published">Published</SelectItem>
+                      <SelectItem value="archived">Archived</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="featured">Featured Post</Label>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="featured"
+                      checked={formData.featured}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, featured: checked }))}
+                    />
+                    <Label htmlFor="featured">Mark as featured</Label>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="readTime">Read Time (minutes)</Label>
+                  <Input
+                    id="readTime"
+                    type="number"
+                    value={formData.readTime}
+                    onChange={(e) => setFormData(prev => ({ ...prev, readTime: e.target.value }))}
+                    placeholder="5"
+                    min="1"
+                  />
+                </div>
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="content">Content *</Label>
@@ -388,39 +426,7 @@ export default function NewPostPage() {
             </CardContent>
           </Card>
 
-          {/* Publishing Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Publishing Settings
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="published">Published</SelectItem>
-                    <SelectItem value="archived">Archived</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="featured"
-                  checked={formData.featured}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, featured: checked }))}
-                />
-                <Label htmlFor="featured">Mark as featured post</Label>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* SEO Settings */}
           <Card>
