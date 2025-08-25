@@ -26,6 +26,7 @@ import Link from 'next/link'
 export default function NewPostPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [isPreview, setIsPreview] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -70,6 +71,10 @@ export default function NewPostPage() {
     setFormData(prev => ({ ...prev, tags: prev.tags.filter(tag => tag !== tagToRemove) }))
   }
 
+  const handlePreview = () => {
+    setIsPreview(!isPreview)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -109,9 +114,9 @@ export default function NewPostPage() {
             <h1 className="text-2xl font-bold">Create New Blog Post</h1>
           </div>
           <div className="ml-auto flex items-center space-x-4">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handlePreview}>
               <Eye className="mr-2 h-4 w-4" />
-              Preview
+              {isPreview ? 'Edit' : 'Preview'}
             </Button>
             <Button onClick={handleSubmit} disabled={isLoading}>
               <Save className="mr-2 h-4 w-4" />
@@ -123,6 +128,7 @@ export default function NewPostPage() {
 
       {/* Main Content */}
       <div className="p-6 sm:p-8 lg:p-12">
+        {!isPreview ? (
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Information */}
           <Card>
@@ -338,10 +344,86 @@ export default function NewPostPage() {
                   onChange={(e) => setFormData(prev => ({ ...prev, seoKeywords: e.target.value }))}
                   placeholder="keyword1, keyword2, keyword3"
                 />
+                {formData.seoKeywords && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {formData.seoKeywords.split(',').map((keyword, index) => (
+                      keyword.trim() && (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {keyword.trim()}
+                        </Badge>
+                      )
+                    ))}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
         </form>
+        ) : (
+        {/* Preview Mode */}
+        <div className="max-w-4xl mx-auto">
+          <article className="prose prose-lg max-w-none">
+            {/* Post Header */}
+            <header className="border-b pb-8 mb-8">
+              <div className="space-y-4">
+                {formData.featured && (
+                  <Badge variant="secondary" className="w-fit">Featured Post</Badge>
+                )}
+                <h1 className="text-4xl font-bold leading-tight">{formData.title || 'Untitled Post'}</h1>
+                {formData.excerpt && (
+                  <p className="text-xl text-muted-foreground leading-relaxed">{formData.excerpt}</p>
+                )}
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    <span>{new Date().toLocaleDateString()}</span>
+                  </div>
+                  {formData.readTime && (
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      <span>{formData.readTime} min read</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1">
+                    <Tag className="h-4 w-4" />
+                    <span className="capitalize">{formData.status}</span>
+                  </div>
+                </div>
+                {formData.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.tags.map((tag, index) => (
+                      <Badge key={index} variant="outline">{tag}</Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </header>
+
+            {/* Featured Image */}
+            {formData.featuredImage && (
+              <div className="mb-8">
+                <img 
+                  src={formData.featuredImage} 
+                  alt={formData.title}
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+              </div>
+            )}
+
+            {/* Post Content */}
+            <div className="prose-content">
+              {formData.content ? (
+                <div 
+                  className="whitespace-pre-wrap"
+                  dangerouslySetInnerHTML={{ __html: formData.content.replace(/\n/g, '<br />') }}
+                />
+              ) : (
+                <p className="text-muted-foreground italic">No content yet. Switch back to edit mode to add content.</p>
+              )}
+            </div>
+          </article>
+        </div>
+        )}
       </div>
     </div>
   )
