@@ -63,13 +63,12 @@ export async function POST(request: Request) {
     // Insert the post
     const result = await sql`
       INSERT INTO cms.posts (
-        title, slug, excerpt, content, category, tags, status, 
-        featured, read_time, featured_image, author_id, published_at
+        title, slug, excerpt, content, category_id, tags, status, 
+        featured, featured_image, author_id, published_at
       ) VALUES (
         ${title}, ${slug}, ${excerpt || null}, ${content}, 
         ${category || null}, ${tags || []}, ${status || 'draft'}, 
-        ${featured || false}, ${readTime ? parseInt(readTime) : null}, 
-        ${featuredImage || null}, ${session.id}, 
+        ${featured || false}, ${featuredImage || null}, ${session.id}, 
         ${status === 'published' ? new Date().toISOString() : null}
       ) RETURNING id
     `
@@ -79,10 +78,10 @@ export async function POST(request: Request) {
     // Insert SEO settings
     await sql`
       INSERT INTO cms.seo_settings (
-        page_type, page_id, meta_title, meta_description, keywords,
+        table_name, record_id, meta_title, meta_description, keywords,
         canonical_url, og_image, og_title, og_description
       ) VALUES (
-        'post', ${postId}, ${seoData.meta_title}, ${seoData.meta_description},
+        'posts', ${postId}, ${seoData.meta_title}, ${seoData.meta_description},
         ${seoData.keywords}, ${seoData.canonical_url}, ${seoData.og_image},
         ${seoData.og_title}, ${seoData.og_description}
       )
@@ -137,16 +136,17 @@ export async function GET(request: Request) {
         p.excerpt,
         p.status,
         p.published_at,
-        p.views_count,
-        p.likes_count,
-        p.read_time,
+        p.view_count,
         p.created_at,
-        p.category,
+        p.category_id,
         p.tags,
         p.featured,
-        u.name as author_name
+        p.featured_image,
+        u.name as author_name,
+        c.name as category_name
       FROM cms.posts p
       LEFT JOIN cms.users u ON p.author_id = u.id
+      LEFT JOIN cms.categories c ON p.category_id = c.id
       ORDER BY p.created_at DESC
     `
 
