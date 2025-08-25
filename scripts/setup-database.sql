@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS cms.posts (
     content TEXT NOT NULL,
     featured_image TEXT,
     status VARCHAR(50) DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
+    featured BOOLEAN DEFAULT FALSE,
     author_id INTEGER REFERENCES cms.users(id),
     category_id INTEGER,
     tags TEXT[],
@@ -78,6 +79,8 @@ CREATE TABLE IF NOT EXISTS cms.portfolio (
     status VARCHAR(50) DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
     featured BOOLEAN DEFAULT FALSE,
     sort_order INTEGER DEFAULT 0,
+    category_id INTEGER REFERENCES cms.categories(id),
+    author_id INTEGER REFERENCES cms.users(id),
     meta_title VARCHAR(255),
     meta_description TEXT,
     seo_data JSONB DEFAULT '{}',
@@ -227,6 +230,11 @@ CREATE INDEX IF NOT EXISTS idx_posts_published ON cms.posts(published_at);
 CREATE INDEX IF NOT EXISTS idx_portfolio_slug ON cms.portfolio(slug);
 CREATE INDEX IF NOT EXISTS idx_portfolio_status ON cms.portfolio(status);
 CREATE INDEX IF NOT EXISTS idx_portfolio_featured ON cms.portfolio(featured);
+CREATE INDEX IF NOT EXISTS idx_portfolio_category ON cms.portfolio(category_id);
+CREATE INDEX IF NOT EXISTS idx_portfolio_author ON cms.portfolio(author_id);
+
+CREATE INDEX IF NOT EXISTS idx_posts_featured ON cms.posts(featured);
+CREATE INDEX IF NOT EXISTS idx_posts_category ON cms.posts(category_id);
 
 CREATE INDEX IF NOT EXISTS idx_services_slug ON cms.services(slug);
 CREATE INDEX IF NOT EXISTS idx_services_status ON cms.services(status);
@@ -252,7 +260,7 @@ INSERT INTO cms.users (name, email, password_hash, role, is_active, is_verified)
 VALUES (
     'Admin User', 
     'admin@sufyanulhaq.com', 
-    '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/5KQqKqK', -- password: admin123
+    '$2b$12$Ojtt07P6T6IbJQ0W9rgRxOYNUvh/n9pStwYtL4F5BkcWay.dID94C', -- password: admin123
     'admin', 
     TRUE, 
     TRUE

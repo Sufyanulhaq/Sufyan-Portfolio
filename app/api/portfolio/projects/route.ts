@@ -78,6 +78,7 @@ export async function GET(request: NextRequest) {
         p.published_at,
         p.created_at,
         p.updated_at,
+        p.author_id,
         u.name as author_name,
         u.email as author_email,
         u.bio as author_bio,

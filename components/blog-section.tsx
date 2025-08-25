@@ -25,8 +25,8 @@ async function getLatestPosts() {
         p.published_at,
         p.created_at,
         p.updated_at,
-        u.name as author_name,
-        u.id as author_id
+        p.author_id,
+        u.name as author_name
       FROM cms.posts p
       LEFT JOIN cms.users u ON p.author_id = u.id
       WHERE p.status = 'published'
