@@ -38,9 +38,13 @@ async function getPortfolio() {
         p.completion_date,
         p.created_at,
         p.view_count,
-        0 as likes_count, // likes_count not in database schema
-        p.featured_image
+        0 as likes_count,
+        p.featured_image,
+        u.name as author_name,
+        c.name as category_name
       FROM cms.portfolio p
+      LEFT JOIN cms.users u ON p.author_id = u.id
+      LEFT JOIN cms.categories c ON p.category_id = c.id
       ORDER BY p.created_at DESC
     `
     

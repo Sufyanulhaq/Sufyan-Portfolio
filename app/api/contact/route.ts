@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { neon } from '@neondatabase/serverless'
+import { sendContactFormNotification } from '@/lib/email-service'
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,8 +53,21 @@ export async function POST(request: NextRequest) {
       ) RETURNING id
     `
 
-    // TODO: Send email notifications using Resend
-    // For now, just log the submission
+    // Send email notification to admin
+    try {
+      await sendContactFormNotification({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        message: message.trim(),
+        phone: phone?.trim(),
+        source: source || "Website"
+      })
+      console.log('Admin notification email sent successfully')
+    } catch (emailError) {
+      console.error('Failed to send admin notification email:', emailError)
+      // Don't fail the form submission if email fails
+    }
+
     console.log('Contact form submitted:', { id: result[0].id, email: email.trim() })
 
     return NextResponse.json({

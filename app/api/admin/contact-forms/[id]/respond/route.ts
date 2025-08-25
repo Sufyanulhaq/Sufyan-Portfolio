@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import { getSession } from '@/lib/auth-actions'
+import { sendClientResponse } from '@/lib/email-service'
 
 export async function POST(
   request: Request,
@@ -54,9 +55,21 @@ export async function POST(
       WHERE id = ${parseInt(params.id)}
     `
 
-    // TODO: Send email response to client
-    // This would integrate with your email service (Resend, SendGrid, etc.)
-    // For now, we'll just log the response
+    // Send email response to client
+    try {
+      await sendClientResponse({
+        adminName: session.name,
+        adminEmail: session.email,
+        responseMessage: message,
+        originalMessage: form.message,
+        clientName: form.name,
+        clientEmail: form.email
+      })
+      console.log('Client response email sent successfully')
+    } catch (emailError) {
+      console.error('Failed to send client response email:', emailError)
+      // Don't fail the response if email fails
+    }
     
     // Log the activity
     await sql`

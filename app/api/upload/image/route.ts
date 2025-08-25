@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
     const filename = `${timestamp}-${Math.random().toString(36).substring(2)}.${fileExtension}`
     
     // For Vercel deployment, we can't write to filesystem
-    // Return a placeholder URL for now
+    // Return a better placeholder URL for now
     // TODO: Integrate with cloud storage (AWS S3, Cloudinary, etc.)
-    const publicUrl = `https://via.placeholder.com/800x600/cccccc/666666?text=Image+Upload+Disabled`
+    const publicUrl = `https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=600&fit=crop&crop=center&auto=format&q=80`
 
     return NextResponse.json({
       success: true,
