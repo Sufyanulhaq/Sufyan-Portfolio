@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
 import { getSession } from '@/lib/auth-actions'
+import { uploadImage } from '@/lib/cloudinary'
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,19 +41,38 @@ export async function POST(request: NextRequest) {
     const fileExtension = file.name.split('.').pop()
     const filename = `${timestamp}-${Math.random().toString(36).substring(2)}.${fileExtension}`
     
-    // For Vercel deployment, we can't write to filesystem
-    // Return a better placeholder URL for now
-    // TODO: Integrate with cloud storage (AWS S3, Cloudinary, etc.)
-    const publicUrl = `https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=600&fit=crop&crop=center&auto=format&q=80`
-
-    return NextResponse.json({
-      success: true,
-      url: publicUrl,
-      filename: filename,
-      originalName: file.name,
-      size: file.size,
-      type: file.type
-    })
+    try {
+      // Upload to Cloudinary
+      const uploadResult = await uploadImage(buffer, filename)
+      
+      return NextResponse.json({
+        success: true,
+        url: uploadResult.secure_url,
+        filename: filename,
+        originalName: file.name,
+        size: file.size,
+        type: file.type,
+        publicId: uploadResult.public_id,
+        width: uploadResult.width,
+        height: uploadResult.height
+      })
+    } catch (uploadError) {
+      console.error('Cloudinary upload failed:', uploadError)
+      
+      // Fallback to placeholder if Cloudinary fails
+      const uniqueId = Math.random().toString(36).substring(2, 15)
+      const fallbackUrl = `https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=600&fit=crop&crop=center&auto=format&q=80&id=${uniqueId}&filename=${encodeURIComponent(file.name)}`
+      
+      return NextResponse.json({
+        success: true,
+        url: fallbackUrl,
+        filename: filename,
+        originalName: file.name,
+        size: file.size,
+        type: file.type,
+        fallback: true
+      })
+    }
 
   } catch (error) {
     console.error('Error uploading image:', error)
