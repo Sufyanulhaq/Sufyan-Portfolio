@@ -33,12 +33,12 @@ async function getPortfolio() {
         p.project_url,
         p.github_url,
         p.technologies,
-        p.category,
+        p.category_id,
         p.client,
         p.completion_date,
         p.created_at,
         p.view_count,
-        p.likes_count,
+        0 as likes_count, // likes_count not in database schema
         p.featured_image
       FROM cms.portfolio p
       ORDER BY p.created_at DESC

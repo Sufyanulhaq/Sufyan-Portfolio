@@ -30,14 +30,14 @@ async function getPosts() {
         p.status,
         p.published_at,
         p.view_count,
-        p.likes_count,
-        p.read_time,
         p.created_at,
-        p.category,
+        p.category_id,
         p.tags,
-        u.name as author_name
+        u.name as author_name,
+        c.name as category_name
       FROM cms.posts p
       LEFT JOIN cms.users u ON p.author_id = u.id
+      LEFT JOIN cms.categories c ON p.category_id = c.id
       ORDER BY p.created_at DESC
     `
     
