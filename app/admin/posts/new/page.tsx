@@ -360,7 +360,7 @@ export default function NewPostPage() {
           </Card>
         </form>
         ) : (
-        {/* Preview Mode */}
+        /* Preview Mode */
         <div className="max-w-4xl mx-auto">
           <article className="prose prose-lg max-w-none">
             {/* Post Header */}
