@@ -29,7 +29,7 @@ async function getPosts() {
         p.excerpt,
         p.status,
         p.published_at,
-        p.views_count,
+        p.view_count,
         p.likes_count,
         p.read_time,
         p.created_at,
@@ -147,7 +147,7 @@ export default async function PostsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {posts.reduce((sum, p) => sum + (p.views_count || 0), 0).toLocaleString()}
+                {posts.reduce((sum, p) => sum + (p.view_count || 0), 0).toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">
                 All posts combined
@@ -215,8 +215,8 @@ export default async function PostsPage() {
                         {post.read_time && (
                           <span>{post.read_time} min read</span>
                         )}
-                        {post.views_count > 0 && (
-                          <span>{post.views_count.toLocaleString()} views</span>
+                        {post.view_count > 0 && (
+                          <span>{post.view_count.toLocaleString()} views</span>
                         )}
                       </div>
                       

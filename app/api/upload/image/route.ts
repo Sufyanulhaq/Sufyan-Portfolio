@@ -42,20 +42,10 @@ export async function POST(request: NextRequest) {
     const fileExtension = file.name.split('.').pop()
     const filename = `${timestamp}-${Math.random().toString(36).substring(2)}.${fileExtension}`
     
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'images')
-    try {
-      await mkdir(uploadsDir, { recursive: true })
-    } catch (error) {
-      // Directory might already exist
-    }
-
-    // Save file
-    const filePath = join(uploadsDir, filename)
-    await writeFile(filePath, buffer)
-
-    // Return the public URL
-    const publicUrl = `/uploads/images/${filename}`
+    // For Vercel deployment, we can't write to filesystem
+    // Return a placeholder URL for now
+    // TODO: Integrate with cloud storage (AWS S3, Cloudinary, etc.)
+    const publicUrl = `https://via.placeholder.com/800x600/cccccc/666666?text=Image+Upload+Disabled`
 
     return NextResponse.json({
       success: true,

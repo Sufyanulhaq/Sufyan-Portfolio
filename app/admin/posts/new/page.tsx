@@ -53,6 +53,7 @@ export default function NewPostPage() {
     seoKeywords: ''
   })
   const [newTag, setNewTag] = useState('')
+  const [commaTags, setCommaTags] = useState('')
 
   const generateSlug = (title: string) => {
     return title
@@ -74,6 +75,16 @@ export default function NewPostPage() {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
       setFormData(prev => ({ ...prev, tags: [...prev.tags, newTag.trim()] }))
       setNewTag('')
+    }
+  }
+
+  const addCommaTags = () => {
+    if (commaTags.trim()) {
+      const tagsToAdd = commaTags.split(',').map(tag => tag.trim()).filter(tag => tag && !formData.tags.includes(tag))
+      if (tagsToAdd.length > 0) {
+        setFormData(prev => ({ ...prev, tags: [...prev.tags, ...tagsToAdd] }))
+        setCommaTags('')
+      }
     }
   }
 
@@ -290,16 +301,29 @@ export default function NewPostPage() {
 
               <div className="space-y-2">
                 <Label>Tags</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    placeholder="Add a tag"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                  />
-                  <Button type="button" onClick={addTag} variant="outline" size="sm">
-                    <Plus className="h-4 w-4" />
-                  </Button>
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      placeholder="Add a tag"
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                    />
+                    <Button type="button" onClick={addTag} variant="outline" size="sm">
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={commaTags}
+                      onChange={(e) => setCommaTags(e.target.value)}
+                      placeholder="Or add multiple tags separated by commas (e.g., tag1, tag2, tag3)"
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCommaTags())}
+                    />
+                    <Button type="button" onClick={addCommaTags} variant="outline" size="sm">
+                      Add Multiple
+                    </Button>
+                  </div>
                 </div>
                 {formData.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">

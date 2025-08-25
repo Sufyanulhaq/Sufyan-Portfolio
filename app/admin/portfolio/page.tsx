@@ -37,7 +37,7 @@ async function getPortfolio() {
         p.client,
         p.completion_date,
         p.created_at,
-        p.views_count,
+        p.view_count,
         p.likes_count,
         p.featured_image
       FROM cms.portfolio p
@@ -162,7 +162,7 @@ export default async function PortfolioPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {portfolio.reduce((sum, p) => sum + (p.views_count || 0), 0).toLocaleString()}
+                {portfolio.reduce((sum, p) => sum + (p.view_count || 0), 0).toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">
                 All projects combined
@@ -276,10 +276,10 @@ export default async function PortfolioPage() {
                           </div>
                         )}
                         
-                        {project.views_count > 0 && (
+                        {project.view_count > 0 && (
                           <div className="flex items-center gap-1">
                             <Eye className="h-3 w-3" />
-                            <span>{project.views_count.toLocaleString()} views</span>
+                            <span>{project.view_count.toLocaleString()} views</span>
                           </div>
                         )}
                       </div>
