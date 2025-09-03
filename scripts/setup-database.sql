@@ -97,7 +97,6 @@ CREATE TABLE IF NOT EXISTS cms.services (
     slug VARCHAR(255) UNIQUE NOT NULL,
     description TEXT,
     content TEXT,
-    long_description TEXT,
     icon VARCHAR(100),
     featured_image TEXT,
     price_range VARCHAR(100),

@@ -19,6 +19,7 @@ async function getLatestPosts() {
       SELECT 
         p.id,
         p.title,
+        p.slug,
         p.excerpt,
         p.status,
         p.view_count,
@@ -26,10 +27,14 @@ async function getLatestPosts() {
         p.created_at,
         p.updated_at,
         p.author_id,
-        u.name as author_name
+        p.featured,
+        p.featured_image,
+        u.name as author_name,
+        c.name as category_name
       FROM cms.posts p
       LEFT JOIN cms.users u ON p.author_id = u.id
-      WHERE p.status = 'published'
+      LEFT JOIN cms.categories c ON p.category_id = c.id
+      WHERE p.status IN ('published', 'draft')
       ORDER BY p.published_at DESC
       LIMIT 3
     `
@@ -37,6 +42,7 @@ async function getLatestPosts() {
     return posts.map((post: any) => ({
       _id: post.id.toString(),
       title: post.title,
+      slug: post.slug, // Use actual slug from database
       excerpt: post.excerpt,
       author: {
         _id: post.author_id?.toString() || '1',
@@ -44,10 +50,10 @@ async function getLatestPosts() {
       },
       createdAt: post.created_at?.toISOString() || new Date().toISOString(),
       updatedAt: post.updated_at?.toISOString() || new Date().toISOString(),
-      category: 'Development',
-      featured: false,
+      category: post.category_name || 'Development',
+      featured: post.featured || false,
       readTime: '8',
-      slug: post.title.toLowerCase().replace(/\s+/g, '-')
+      coverImage: post.featured_image // Use actual featured image
     }))
   } catch (error) {
     console.error("Error fetching latest posts:", error)
@@ -106,12 +112,7 @@ export default async function BlogSection() {
                 <Image
                   src={
                     (post as any).coverImage || 
-                    (post.category === "Development" && "/images/blogs/blog-post-1.jpg") ||
-                    (post.category === "Technology" && "/images/blogs/blog-post-2.jpg") ||
-                    (post.category === "SEO" && "/images/blogs/blog-post-3.jpg") ||
-                    (post.category === "Backend" && "/images/blogs/blog-post-1.jpg") ||
-                    (post.category === "Performance" && "/images/blogs/blog-post-2.jpg") ||
-                    "/images/blogs/blog-post-3.jpg"
+                    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=600&fit=crop&crop=center&auto=format&q=80"
                   }
                   alt={post.title}
                   fill

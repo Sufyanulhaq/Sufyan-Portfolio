@@ -47,7 +47,7 @@ async function getPostBySlug(slug: string) {
       FROM cms.posts p
       LEFT JOIN cms.users u ON p.author_id = u.id
       LEFT JOIN cms.categories c ON p.category_id = c.id
-      WHERE p.slug = ${slug} AND p.status = 'published'
+      WHERE p.slug = ${slug} AND p.status IN ('published', 'draft')
       LIMIT 1
     `
 
@@ -114,7 +114,7 @@ async function getRelatedPosts(currentPostId: number, limit = 3) {
       LEFT JOIN cms.users u ON p.author_id = u.id
       LEFT JOIN cms.categories c ON p.category_id = c.id
       WHERE p.id != ${currentPostId} 
-        AND p.status = 'published'
+        AND p.status IN ('published', 'draft')
       ORDER BY p.published_at DESC
       LIMIT ${limit}
     `

@@ -44,7 +44,7 @@ export default function NewPostPage() {
     content: '',
     category: '', // This will store category ID as string
     tags: [] as string[],
-    status: 'draft',
+    status: 'published',
     featured: false,
     readTime: '',
     featuredImage: '',
