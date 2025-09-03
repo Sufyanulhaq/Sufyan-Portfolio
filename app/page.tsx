@@ -4,7 +4,7 @@ import { ArrowRight, Code, Palette, Zap, Star, TrendingUp, Users, Globe, Award, 
 import Link from "next/link"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
-import BlogSection from "@/components/blog-section"
+
 
 // Force dynamic rendering to prevent build-time data fetching
 export const dynamic = 'force-dynamic'
@@ -483,21 +483,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Blog Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Latest Insights
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Thoughts on modern web development, industry trends, and technical deep-dives.
-            </p>
-          </div>
-          
-          <BlogSection />
-        </div>
-      </section>
+
 
       {/* CTA Section */}
       <section className="py-20 bg-primary text-primary-foreground">

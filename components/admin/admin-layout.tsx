@@ -61,15 +61,7 @@ const navigation = [
     icon: LayoutDashboard,
     current: true,
   },
-  {
-    name: 'Posts',
-    icon: FileText,
-    children: [
-      { name: 'All Posts', href: '/admin/posts', icon: FileText },
-      { name: 'Add New', href: '/admin/posts/new', icon: Plus },
-      { name: 'Categories', href: '/admin/categories', icon: Tag },
-    ],
-  },
+
   {
     name: 'Media',
     href: '/admin/media',
@@ -123,7 +115,7 @@ const navigation = [
 
 export default function AdminLayout({ children, user }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [expandedItems, setExpandedItems] = useState<string[]>(['Posts'])
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
   const pathname = usePathname()
 
   const toggleExpanded = (itemName: string) => {
