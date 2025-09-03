@@ -74,7 +74,8 @@ export default async function BlogSection() {
       featured: true,
       createdAt: new Date().toISOString(),
       readTime: "8",
-      slug: "building-high-performance-react-applications"
+      slug: "building-high-performance-react-applications",
+      coverImage: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=600&fit=crop&crop=center&auto=format&q=80"
     },
     {
       _id: "2", 
@@ -84,7 +85,8 @@ export default async function BlogSection() {
       featured: false,
       createdAt: new Date().toISOString(),
       readTime: "12",
-      slug: "future-of-web-development-ai-integration"
+      slug: "future-of-web-development-ai-integration",
+      coverImage: "https://images.unsplash.com/photo-1555066932-4365d14bab8d?w=800&h=600&fit=crop&crop=center&auto=format&q=80"
     },
     {
       _id: "3",
@@ -94,7 +96,8 @@ export default async function BlogSection() {
       featured: false,
       createdAt: new Date().toISOString(),
       readTime: "10",
-      slug: "seo-best-practices-2025"
+      slug: "seo-best-practices-2025",
+      coverImage: "https://images.unsplash.com/photo-1555066933-4365d14bab8e?w=800&h=600&fit=crop&crop=center&auto=format&q=80"
     }
   ]
 
@@ -112,6 +115,11 @@ export default async function BlogSection() {
                 <Image
                   src={
                     (post as any).coverImage || 
+                    (post.category === "Development" && "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=600&fit=crop&crop=center&auto=format&q=80") ||
+                    (post.category === "Technology" && "https://images.unsplash.com/photo-1555066932-4365d14bab8d?w=800&h=600&fit=crop&crop=center&auto=format&q=80") ||
+                    (post.category === "SEO" && "https://images.unsplash.com/photo-1555066933-4365d14bab8e?w=800&h=600&fit=crop&crop=center&auto=format&q=80") ||
+                    (post.category === "Backend" && "https://images.unsplash.com/photo-1555066934-4365d14bab8f?w=800&h=600&fit=crop&crop=center&auto=format&q=80") ||
+                    (post.category === "Database" && "https://images.unsplash.com/photo-1555066935-4365d14bab9a?w=800&h=600&fit=crop&crop=center&auto=format&q=80") ||
                     "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=600&fit=crop&crop=center&auto=format&q=80"
                   }
                   alt={post.title}

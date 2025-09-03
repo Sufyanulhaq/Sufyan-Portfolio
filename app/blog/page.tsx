@@ -1,29 +1,84 @@
-"use client"
-
-import { useState } from "react"
+import { neon } from '@neondatabase/serverless'
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { 
-  Search, 
-  Filter, 
   ExternalLink, 
   User, 
   Calendar, 
   Clock, 
-  TrendingUp, 
   ArrowRight,
   BookOpen,
   Tag,
   Eye,
-  Heart
+  Search
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
+async function getBlogPosts() {
+  try {
+    if (!process.env.DATABASE_URL) {
+      console.log("DATABASE_URL not configured, using fallback data")
+      return []
+    }
+
+    const sql = neon(process.env.DATABASE_URL)
+    
+    const posts = await sql`
+      SELECT 
+        p.id,
+        p.title,
+        p.slug,
+        p.excerpt,
+        p.content,
+        p.status,
+        p.view_count,
+        p.published_at,
+        p.created_at,
+        p.updated_at,
+        p.author_id,
+        p.featured,
+        p.featured_image,
+        p.tags,
+        u.name as author_name,
+        c.name as category_name
+      FROM cms.posts p
+      LEFT JOIN cms.users u ON p.author_id = u.id
+      LEFT JOIN cms.categories c ON p.category_id = c.id
+      WHERE p.status IN ('published', 'draft')
+      ORDER BY p.published_at DESC
+    `
+
+    return posts.map((post: any) => ({
+      id: post.id.toString(),
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      content: post.content,
+      author: {
+        name: post.author_name || 'Sufyan Ul Haq',
+        role: 'Full-Stack Developer'
+      },
+      category: post.category_name || 'Development',
+      tags: post.tags || [],
+      publishedAt: post.published_at?.toISOString() || post.created_at?.toISOString(),
+      readTime: '8 min read',
+      featured: post.featured || false,
+      views: post.view_count || 0,
+      likes: 0,
+      coverImage: post.featured_image || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=600&fit=crop&crop=center&auto=format&q=80"
+    }))
+  } catch (error) {
+    console.error("Error fetching blog posts:", error)
+    return []
+  }
+}
 
 interface BlogPost {
   id: string
@@ -45,12 +100,11 @@ interface BlogPost {
   slug: string
 }
 
-export default function BlogPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("all")
-  const [showFeatured, setShowFeatured] = useState(false)
-
-  const blogPosts: BlogPost[] = [
+export default async function BlogPage() {
+  const blogPosts = await getBlogPosts()
+  
+  // Fallback data if no posts from database
+  const fallbackPosts: BlogPost[] = [
     {
       id: "1",
       title: "Building High-Performance React Applications",
@@ -167,19 +221,10 @@ export default function BlogPage() {
     }
   ]
 
+  const displayPosts = blogPosts.length > 0 ? blogPosts : fallbackPosts
   const categories = ["all", "Development", "Technology", "SEO", "Backend", "Database", "Frontend", "Design"]
-  const featuredPosts = blogPosts.filter(post => post.featured)
-  const recentPosts = blogPosts.slice(0, 3)
-
-  const filteredPosts = blogPosts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-    const matchesCategory = selectedCategory === "all" || post.category === selectedCategory
-    const matchesFeatured = !showFeatured || post.featured
-
-    return matchesSearch && matchesCategory && matchesFeatured
-  })
+  const featuredPosts = displayPosts.filter(post => post.featured)
+  const recentPosts = displayPosts.slice(0, 3)
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-GB', {
@@ -272,42 +317,16 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Filters and Search */}
+      {/* All Posts Section */}
       <section className="py-8 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-4 flex-1 max-w-md">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search articles..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full sm:w-40">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category === "all" ? "All Categories" : category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <Button
-              variant={showFeatured ? "default" : "outline"}
-              onClick={() => setShowFeatured(!showFeatured)}
-              className="flex items-center gap-2"
-            >
-              <TrendingUp className="h-4 w-4" />
-              Featured Only
-            </Button>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
+              All Articles
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Explore all my latest articles and insights
+            </p>
           </div>
         </div>
       </section>
@@ -316,7 +335,7 @@ export default function BlogPage() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8">
-            {filteredPosts.map((post) => (
+            {displayPosts.map((post) => (
               <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-all duration-300">
                 <div className="h-64 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
                   <div className="text-center">
@@ -399,7 +418,7 @@ export default function BlogPage() {
             ))}
           </div>
 
-          {filteredPosts.length === 0 && (
+          {displayPosts.length === 0 && (
             <div className="text-center py-16">
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="h-8 w-8 text-muted-foreground" />
@@ -408,15 +427,10 @@ export default function BlogPage() {
               <p className="text-muted-foreground mb-6">
                 Try adjusting your search criteria or filters to find what you're looking for.
               </p>
-              <Button
-                onClick={() => {
-                  setSearchTerm("")
-                  setSelectedCategory("all")
-                  setShowFeatured(false)
-                }}
-                variant="outline"
-              >
-                Clear Filters
+              <Button asChild variant="outline">
+                <Link href="/blog">
+                  View All Posts
+                </Link>
               </Button>
             </div>
           )}
